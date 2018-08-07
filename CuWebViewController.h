@@ -17,7 +17,7 @@
 @interface CuWebViewController : UIViewController
 {
 @private
-    JSContext * context;     //js的环境
+    JSContext * context;     //js的
     NSString * cuIp;       //CU的地址
     NSString * innerCuUrl;  //内网地址
     UIWebView * myWebView;  //加载网页的view
