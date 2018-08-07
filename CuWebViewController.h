@@ -11,6 +11,7 @@
 #import "JSCallOc.h"
 #import "vminfo.h"
 #import "RDPSessionViewController.h"
+#import "CommonUtils.h"
 
 
 @interface CuWebViewController : UIViewController
@@ -23,4 +24,5 @@
     NSString * innerNet;    //内外网的标志位 1：外网， 0：内网
 }
 @property(nonatomic,strong) vminfo *connectInfo;
+
 @end

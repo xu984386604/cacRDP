@@ -68,7 +68,7 @@ extern NSString* TSXSessionDidFailToConnectNotification;
 @property (assign) BOOL toolbarVisible;
 @property (readonly) CGContextRef bitmapContext;
 @property (readonly) NSCondition* uiRequestCompleted;
-
+@property (assign, atomic) int isClosed;//是否关闭了
 
 // initialize a new session with the given bookmark
 - (id)initWithBookmark:(ComputerBookmark*)bookmark;

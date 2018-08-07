@@ -27,7 +27,7 @@
     NSLog(@"%@",_dic);
    
     //解析json数据保存到vminfo中
-   vminfo * myinfo = [vminfo share];
+    vminfo * myinfo = [vminfo share];
     myinfo.tsip=[_dic objectForKey:@"tsip"];
     myinfo.tsport=[_dic objectForKey:@"tsport"];
     myinfo.tspwd=[_dic objectForKey:@"tspwd"];
@@ -37,12 +37,13 @@
     myinfo.vmpasswd=[_dic objectForKey:@"vmpsswd"];
     myinfo.vmusername=[_dic objectForKey:@"vmusername"];
     NSString* remoteProgram=[_dic objectForKey:@"remoteProgram"];
+    myinfo.appid = [_dic objectForKey:@"id"];
+    myinfo.uid = [_dic objectForKey:@"username"];
 
      //docker应用处理
     NSString *apptype=[_dic objectForKey:@"appType"];
     if([apptype isEqualToString:@"lca"])
     {
-    
         myinfo.dockerId=[_dic objectForKey:@"docker_id"];
         myinfo.dockerIp=[_dic objectForKey:@"docker_ip"];
         myinfo.dockerVncPwd=[_dic objectForKey:@"docker_vncpwd"];
@@ -70,7 +71,7 @@
 
 -(void)openRdp
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"openRdp" object:NULL];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"openRdp" object:nil];
 }
 
 /*******
@@ -89,15 +90,15 @@
     
     //解析出了uid，通过vminfo共享数据
     [vminfo share].uid=uid;
-    //发送通知，想服务器发送消息
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:NULL];
+    //发送通知，向服务器发送消息
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"loginMsg"];
 
 }
 //注销的时候，停止发送心跳
 -(void)StopHeartBeat:(id)num
 {
     
-     [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:nil];
+     [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"loginMsg"];
 }
 
 

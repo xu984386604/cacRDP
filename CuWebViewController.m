@@ -11,6 +11,7 @@
 
 @interface CuWebViewController ()
 @property(nonatomic,strong)NSTimer * mytimer; //计时器
+
 @end
 
 @implementation CuWebViewController
@@ -33,9 +34,9 @@
     
     
     //注册观察者处理事件
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:NULL];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stoppostMessageToservice) name:@"stoppostMessageToservice" object:nil];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stoppostMessageToservice:) name:@"stoppostMessageToservice" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postMessageToService:) name:@"postMessageToservice" object:nil];
     _connectInfo = [vminfo share];
 }
 
@@ -93,9 +94,7 @@
         [self sendMessageToDocker];
     }
     
-    
-    
-    
+
     CGRect rect = [[UIScreen mainScreen] bounds];
     CGSize size = rect.size;
     
@@ -112,15 +111,46 @@
     
     NSLog(@"%@",[bookmark params]);
     RDPSession* session = [[[RDPSession alloc] initWithBookmark:bookmark] autorelease];
-    
     RDPSessionViewController* ctrl = [[[RDPSessionViewController alloc] initWithNibName:@"RDPSessionView" bundle:nil session:session] autorelease];
     
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self presentViewController:ctrl animated:YES completion:^{}];
     });
-
     
+    NSLog(@"%@:%@:%@:%@", [vminfo share].appid, [vminfo share].vmusername, [vminfo share].vmip, [vminfo share].uid);
+   NSDictionary *jsonData = @{
+                 @"appid": [vminfo share].appid,
+                 @"vmuser": [vminfo share].vmusername,
+                 @"userid": [vminfo share].uid,
+                 @"vmip": [vminfo share].vmip
+                 };
+    NSString *key = [NSString stringWithFormat:@"ios%@", [CuWebViewController cNowTimestamp]];
+   
+    
+    
+    //[[vminfo share].multiRdpSession setObject:session forKey:key]; //多个远程应用需要的操作
+    //NSLog(@"存入multiRdpSession的信息：%@", [[vminfo share].multiRdpSession objectForKey:key]);
+    [[vminfo share].multiRdpRecoverInfo setObject:jsonData forKey:key];
+    NSLog(@"存入multiRdpRecoverInfo的信息：%@", [[vminfo share].multiRdpRecoverInfo objectForKey:key]);
+    //如果之前不存在已打开的应用
+    //if ([[vminfo share].multiRdpRecoverInfo count] == 1) {
+    //     [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"recoverMsg"];
+    //}
+
+    //[vminfo filterRecoverRdpinfoDic];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"recoverMsg"];
+}
+
+
+
+//返回当前时间戳的字符串
++ (NSString *)cNowTimestamp {
+    NSDate *newDate = [NSDate date];
+    long int timeSp = (long)[newDate timeIntervalSince1970];
+    NSString *tempTime = [NSString stringWithFormat:@"%ld",timeSp];
+    return tempTime;
 }
 
 
@@ -166,63 +196,97 @@
 
 
 #pragma mark heartbeat
--(void)postMessageToService
+-(void)postMessageToService: (NSNotification*) notification
 {
-    //启动时就发送消息
-    [self sendMessage];
-    //每个120s发送一次
-    _mytimer=[NSTimer scheduledTimerWithTimeInterval:120.0 target:self selector:@selector(sendeMessage) userInfo:nil repeats:YES];
-
-}
-
-//停止发送消息 用户注销的时候执行
--(void)stoppostMessageToservice
-{
-    [_mytimer invalidate];
-    _mytimer=nil;
-}
--(void)sendMessage
-{
-    NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/updateLoginStatus",cuIp];
-    NSURL *url=[NSURL URLWithString:Reset_vm_User];
-    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
-    myrequest.HTTPMethod=@"POST";
+    NSString* obj = (NSString*)[notification object];//获取到传递的对象
     
-    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    
-    //生成一个唯一标示符
-    NSString *mytimestr = [[NSUserDefaults standardUserDefaults] objectForKey:@"oneloginuuid"];
-    NSLog(@"oneloginuuid:%@", mytimestr);
-    NSString *uid=[vminfo share].uid;
-    
-    //发送的数据
-    NSDictionary *json=@{
-                         @"key":mytimestr,
-                         @"type":@"IOS",
-                         @"userid":uid
-                         };
-
-    NSData *data=[NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest.HTTPBody=data;
-    
-    NSData *recvData=[NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
-    if(recvData !=nil)
-    {
-        
-        NSDictionary *dic=[NSJSONSerialization JSONObjectWithData:recvData options:NSJSONWritingPrettyPrinted error:nil];
-        NSNumber *mycode=[dic objectForKey:@"code"];
-        
-        //如果返回值是800 成功
-        if ([mycode isEqualToNumber:[NSNumber numberWithLong:800]]) {
-            NSLog(@"登陆信息正确");
-        }
-        else if([mycode isEqualToNumber:[NSNumber numberWithLong:814]])
-        {
-             //登陆超时处理
-            [self callJsLogoff];
+    if ([obj isEqualToString:@"loginMsg"]) {
+        [self sendMessage: @"loginMsg"];
+        //每个120s发送一次
+        if (!_mytimer) {
+            _mytimer = [NSTimer scheduledTimerWithTimeInterval:120.0 target:self selector:@selector(sendTimerMessage:) userInfo:@{@"smsType":@"loginMsg"} repeats:YES];
         }
     }
+    if ([obj isEqualToString:@"recoverMsg"]) {
+        [self sendMessage: @"recoverMsg"];
+        //每个300s发送一次
+        if (![vminfo share].recoverTimer) {
+            [vminfo share].recoverTimer = [NSTimer scheduledTimerWithTimeInterval:300.0 target:self selector:@selector(sendTimerMessage:) userInfo:@{@"smsType":@"recoverMsg"} repeats:YES];
+        }
+    }
+}
 
+//停止发送消息,单点登录的信息在用户注销的时候执行
+-(void)stoppostMessageToservice:(NSNotification*) notification
+{
+    NSString* obj = (NSString*)[notification object];//获取到传递的对象
+    if ([obj  isEqual: @"recoverMsg"]) {
+        [[vminfo share].recoverTimer invalidate];
+        [vminfo share].recoverTimer  = nil;
+    }
+    if ([obj  isEqual: @"recoverMsg"]) {
+        [_mytimer invalidate];
+        _mytimer = nil;
+    }
+}
+
+//NStimer的回调方法只能是不带参数的方法或者是带参数但是参数本身只能是NStimer的方法
+-(void)sendTimerMessage:(NSTimer*) timer{
+    NSString *smsType = [timer.userInfo objectForKey:@"smsType"];
+    [self sendMessage:smsType];
+}
+
+-(void)sendMessage:(NSString*) smsType
+{
+    NSString *ip=[vminfo share].cuIp;
+    NSString *handleUrl = [NSString stringWithFormat:@"%@", ip];
+    NSDictionary *jsonData = nil;
+    NSURL *url=[NSURL URLWithString:handleUrl];
+    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
+    myrequest.HTTPMethod=@"POST";
+    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    NSString *mytimestr = [[NSUserDefaults standardUserDefaults] objectForKey:@"oneloginuuid"];
+    NSLog(@"oneloginuuid:%@", mytimestr);
+    
+    if ([smsType  isEqual: @"loginMsg"]) {
+        handleUrl = [handleUrl stringByAppendingString:@"cu/index.php/Home/Client/updateLoginStatus"];
+        jsonData = @{
+                     @"key":mytimestr,
+                     @"type":@"IOS",
+                     @"userid":[vminfo share].uid
+                     };
+    }
+    
+    if([smsType  isEqual: @"recoverMsg"]) {
+        handleUrl = [handleUrl stringByAppendingString:@"cu/index.php/Home/Client/UpdateAppUseStatus"];
+        
+        jsonData = [vminfo share].multiRdpRecoverInfo;
+    }
+    
+    NSData *data = [NSJSONSerialization dataWithJSONObject:jsonData options:NSJSONWritingPrettyPrinted error:nil];
+    myrequest.HTTPBody = data;
+    NSData *recvData = [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+    
+    if(recvData !=nil)
+    {
+        if ([smsType  isEqual: @"loginMsg"]) {
+            NSDictionary *dic=[NSJSONSerialization JSONObjectWithData:recvData options:NSJSONWritingPrettyPrinted error:nil];
+            NSNumber *mycode=[dic objectForKey:@"code"];
+            //如果返回值是800 成功
+            if ([mycode isEqualToNumber:[NSNumber numberWithLong:800]]) {
+                NSLog(@"登陆信息正确");
+            }
+            else if([mycode isEqualToNumber:[NSNumber numberWithLong:814]])
+            {
+                [self callJsLogoff];
+            }
+        } else if([smsType  isEqual: @"recoverMsg"]) {
+            //待定
+            NSDictionary *dic=[NSJSONSerialization JSONObjectWithData:recvData options:NSJSONWritingPrettyPrinted error:nil];
+            NSLog(@"收到的恢复rdp的返回信息：%@", dic);
+        }
+        
+    }
 }
 
 
@@ -232,7 +296,7 @@
     NSString *textJS=@"window.client.exit(true);";
     [context evaluateScript:textJS];
     [_mytimer invalidate];
-    _mytimer=nil;
+    _mytimer = nil;
 }
 
 #pragma mark 判断是否是外网

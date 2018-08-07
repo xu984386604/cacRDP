@@ -372,7 +372,6 @@
 
 - (void)sessionWillConnect:(RDPSession*)session
 {
-    
     //new add触发器开始计时
     NSLog(@"start....");
     is_timeup=NO;
@@ -433,15 +432,10 @@
 }
 
 
-
-
-
-
-
 - (void)sessionDidConnect:(RDPSession*)session
 {
     //登录成功，设置flag
-    NSLog(@"success to connect  message....");
+    NSLog(@"success connect to server!");
     if (!IOS_VERSION_7_OR_ABOVE)
     {
         CGRect rect=_touchpointer_view.frame;
@@ -463,7 +457,7 @@
     //登陆成功关掉计时器
     if(is_timeup) //计时器没到时才关闭
         [timer invalidate]; //关闭计时器。。。
-    [[self view] makeToast:NSLocalizedString(@"接入云端成功。。。", @"success to connect  message") duration:ToastDurationNormal position:@"center"];
+    [[self view] makeToast:NSLocalizedString(@"接入云端成功........", @"success connect to server!") duration:ToastDurationNormal position:@"center"];
     
     //new add 2缩放
     /*CGAffineTransform mytransform=CGAffineTransformScale(_session_scrollview.transform, 0.8, 0.7);
@@ -517,7 +511,7 @@
 //返回最初的界面
 - (void)sessionDidDisconnect:(RDPSession*)session
 {
-    //想服务器发送关闭指令
+    //向服务器发送关闭指令
     
     [self closeOpenRdp];
     
@@ -561,15 +555,14 @@
             NSLog(@"%@",mycode);
         }//else
         
-    }//if
+    }//if
     
     if([[vminfo share].apptype isEqualToString:@"lca"])
     {
         [self sendDockerMessageToService];
     }
-    
 }
-//关闭docker应用的时候，想服务器发送消息
+//关闭docker应用的时候，向服务器发送消息
 -(void)sendDockerMessageToService
 {
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/sendMessageToDockerManager",[vminfo share].cuIp];
@@ -612,7 +605,6 @@
     _session_scrollview.contentInset=UIEdgeInsetsMake(30, 0, 0, 0);
 
     // reset  zoom level and update content size
-    NSLog(@"为甚么你没有缩成0.5");
     //设置画布大小的
     [_session_scrollview setContentSize:view_rect.size];
 

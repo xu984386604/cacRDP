@@ -7,9 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "client/iOS/Models/RDPSession.h"
 
 @interface vminfo : NSObject
 
+@property (nonatomic, copy) NSString *commonAppId;
 //用户信息
 @property (nonatomic, copy) NSString *vm;
 @property (nonatomic, copy) NSString *vmip;
@@ -28,11 +30,11 @@
 
 
 @property (nonatomic, copy) NSString *tsport;
-@property (nonatomic,copy)  NSString *tsusername;
+@property (nonatomic, copy) NSString *tsusername;
 @property (nonatomic, copy) NSString *tsip;
 @property (nonatomic,copy)  NSString *tspwd;
 
-
+//ct用户的id
 @property (nonatomic,copy)  NSString *uid;
 
 //应用类型
@@ -45,9 +47,14 @@
 @property (nonatomic,copy) NSString * appid;
 
 
-@property (nonatomic,copy) NSString * cuIp;
+@property (nonatomic,copy) NSString *cuIp;
 
+@property (nonatomic, strong) NSTimer *recoverTimer; //恢复连接信息的定时发送器
+@property (nonatomic, strong) NSTimer *checkTimer; //检查存活的远程应用（session）的定时器
+
+@property(atomic, strong) NSMutableDictionary *multiRdpRecoverInfo; //保存多个远程应用的恢复信息
+@property(atomic, strong) NSMutableDictionary *multiRdpSession; //保存多个远程应用session
 
 +(instancetype) share;
-
++(void) filterRecoverRdpinfoDic;
 @end
