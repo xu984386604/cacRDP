@@ -11,4 +11,5 @@
 @interface CommonUtils : NSObject
 + (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString;
 + (NSString*)dictionaryToJson:(NSDictionary *)dic;
++ (NSString *)cNowTimestamp;
 @end

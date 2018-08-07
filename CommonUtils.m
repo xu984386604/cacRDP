@@ -40,4 +40,12 @@
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
+//返回当前时间戳的字符串
++ (NSString *)cNowTimestamp {
+    NSDate *newDate = [NSDate date];
+    long int timeSp = (long)[newDate timeIntervalSince1970];
+    NSString *tempTime = [NSString stringWithFormat:@"%ld",timeSp];
+    return tempTime;
+}
+
 @end
