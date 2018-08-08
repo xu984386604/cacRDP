@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "JSCallOcProtocol.h"
 #import "vminfo.h"
+#import "CommonUtils.h"
 
 @interface JSCallOc : NSObject<JSCallOcProtocol>
 @property(nonatomic,strong)NSMutableDictionary *dic; //私有变量

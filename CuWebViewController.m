@@ -23,7 +23,7 @@
     //innerCuUrl=@"http://172.20.100.11/";
     innerNet=@"1"; //默认外网
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
-    [super viewDidLoad];
+    [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
     
     [self loadLocalHTML:@"ipconfig" inDirectory:@"ipconfig"];
     //判断内外网
@@ -31,10 +31,12 @@
     
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stoppostMessageToservice:) name:@"stoppostMessageToservice" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stoppostMessageToservice:) name:@"stoppostMessageToservice" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postMessageToService:) name:@"postMessageToservice" object:nil];
     //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isExternalNetwork) name:@"isExternalNetwork" object:nil];
     _connectInfo = [vminfo share];
+    
+    //[self checkCookies]; //测试用
 }
 
 #pragma mark 网页加载
@@ -134,6 +136,8 @@
     //[vminfo filterRecoverRdpinfoDic];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"recoverMsg"];
+    
+    //[self clearCookies];
 }
 
 #pragma mark initJsContext
@@ -155,13 +159,12 @@
 #pragma mark 设置第一次启动标志
 //判断程序是否是第一次安装启动
 //生成唯一的uuid
--(void)isFirstLoad
+-(void) isFirstLoad
 {
     BOOL tmp=[[NSUserDefaults standardUserDefaults] boolForKey:@"firstLaunch"];
     if(!tmp)
     {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"firstLaunch"];
-
         NSString *str = [[NSUUID UUID] UUIDString];
         [[NSUserDefaults standardUserDefaults] setValue:str forKey:@"oneloginuuid"];
         NSLog(@"生成uuid");
@@ -451,5 +454,20 @@
     }
 }
 
+- (void) checkCookies {
+    NSLog(@"开始打印cookie");
+    NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+    for (NSHTTPCookie *cookie in [storage cookies]){
+        NSLog(@"cookie:%@", cookie);
+    }
+}
 
+- (void) clearCookies {
+    NSLog(@"开始删除cookie");
+    NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+    for (NSHTTPCookie *cookie in [storage cookies]){
+        [storage deleteCookie:cookie];
+    }
+}
+   
 @end

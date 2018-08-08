@@ -101,9 +101,31 @@
     NSString *url=[mydic objectForKey:@"url"];
     [vminfo share].cuIp = url;
     NSLog(@"收到的ipurl:%@", url);
-    //[[NSNotificationCenter defaultCenter] postNotificationName:@"isExternalNetwork" object:nil];
+    
+    
+    //默认处理这种格式的字符串“http://google.com/”
+    NSMutableString *mUrl = [NSMutableString stringWithString:url];
+    if ([mUrl containsString:@"http://"]) {
+        [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"http://"]];
+    }
+    if ([mUrl containsString:@"https://"]) {
+        [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"https://"]];
+    }
+    if ([mUrl containsString:@"/"]) {
+        [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"/"]];
+    }
+    
+    int isInnerIP = [CommonUtils isInnerIP:mUrl];
+    //-1代表错误，1代表外网，0代表内网
+    if(isInnerIP == -1) {
+        NSLog(@"无法判断内外网！凉凉..........");
+    } else if(isInnerIP == 0) {
+        [vminfo share].gatewaycheck=@"NO";
+        NSLog(@"是内网！");
+    } else if(isInnerIP == 1) {
+        [vminfo share].gatewaycheck=@"YES";
+        NSLog(@"是外网！");
+    }
 }
-
-
 
 @end

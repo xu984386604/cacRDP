@@ -443,7 +443,6 @@
                     //跳转前向端发消息
                     getCUAdress('http://'+ipstr+'/');
                     window.location.href=ipurl;
-                    
                     }else{
                     return;
                     }
@@ -529,6 +528,7 @@
                                              console.log(xhr.status)
                                              if(xhr.status == 200){
                                              //跳转前向端发消息
+                                    
                                              getCUAdress('http://'+ipstr+'/');
                                              if(localStorage.getItem('lastip')){
                                              localStorage.setItem('lastip',ipstr);
@@ -547,7 +547,13 @@
                                              return false;
                                    }
         function getCUAdress(ipstr){
-            window.app.getCUAdress(JSON.stringify({url:ipstr}))
+            window.app.getCUAdress(JSON.stringify(
+                                                  {
+                                                  url:ipstr,
+                                                  yosangcookie:document.cookie
+                                                  }
+                                                  )
+                                   )
         }
         function operationData(myurl,method,data){
             return $.ajax({

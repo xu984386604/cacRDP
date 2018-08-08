@@ -50,7 +50,7 @@
 @property (nonatomic,copy) NSString *cuIp;
 
 @property (nonatomic, strong) NSTimer *recoverTimer; //恢复连接信息的定时发送器
-@property (nonatomic, strong) NSTimer *checkTimer; //检查存活的远程应用（session）的定时器
+@property (nonatomic, strong) NSTimer *checkTimer; //检查存活的远程应用（session）的定时器,存在多个rdp远程应用时会用到
 
 @property(atomic, strong) NSMutableDictionary *multiRdpRecoverInfo; //保存多个远程应用的恢复信息
 @property(atomic, strong) NSMutableDictionary *multiRdpSession; //保存多个远程应用session

@@ -12,4 +12,5 @@
 + (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString;
 + (NSString*)dictionaryToJson:(NSDictionary *)dic;
 + (NSString *)cNowTimestamp;
++ (int)isInnerIP:(NSString *)hostName;
 @end
