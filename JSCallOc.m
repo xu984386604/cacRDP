@@ -9,14 +9,13 @@
 #import "JSCallOc.h"
 
 @implementation JSCallOc
+
 /*****************************
  
  **parameter：json数据
  **function：解析并且保存json数据
  
  *****************************/
-
-
 -(void)AcceptTheDataFromJs:(NSString *)data
 {
    NSData *str=[data dataUsingEncoding:NSUTF8StringEncoding];
@@ -54,21 +53,16 @@
     }
     
     myinfo.remoteProgram=[NSString  stringWithFormat:@"opener.exe %@", remoteProgram];
-    
-    
-    
     //接收的数据不为空则可以调用来打开RDP
     [self openRdp];
-    
 }
+
 /*****************************
  
  **parameter：无
  **function：向消息中心发送“openRdp”的消息，cuWebVC中用于处理该事件
  
  *****************************/
-
-
 -(void)openRdp
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"openRdp" object:nil];
@@ -78,7 +72,6 @@
  **parameter：json数据
  **function：解析json数据中的uid，向服务器发送心跳
 *******/
-
 -(void)AcceptUidAndKeepHeartBeat:(NSString *)data
 {
     //解析保存uid
@@ -97,12 +90,19 @@
 //注销的时候，停止发送心跳
 -(void)StopHeartBeat:(id)num
 {
-    
      [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"loginMsg"];
 }
 
-
-
+//获取cu地址
+-(void) getCUAddress:(NSString *)ipUrl {
+    NSData *str=[ipUrl dataUsingEncoding:NSUTF8StringEncoding];
+    NSError * err;
+    NSDictionary *mydic=[NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
+    NSString *url=[mydic objectForKey:@"url"];
+    [vminfo share].cuIp = url;
+    NSLog(@"收到的ipurl:%@", url);
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"isExternalNetwork" object:nil];
+}
 
 
 

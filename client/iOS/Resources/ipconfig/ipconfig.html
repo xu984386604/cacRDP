@@ -1,559 +1,587 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>配置IP</title>
-    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.0/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="./static/css/iconfont.css">
-    <link rel="stylesheet" type="text/css" href="./static/css/normalize.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/cs-select.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/cs-skin-underline.css" />
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+                <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>配置IP</title>
+                    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.0/jquery.min.js"></script>
+                    <link rel="stylesheet" type="text/css" href="./static/css/iconfont.css">
+                        <link rel="stylesheet" type="text/css" href="./static/css/normalize.css" />
+                        <link rel="stylesheet" type="text/css" href="./static/css/cs-select.css" />
+                        <link rel="stylesheet" type="text/css" href="./static/css/cs-skin-underline.css" />
+    </head>
     <body>
-        <div class="y-wrap">
+        <body>
+            <div class="y-wrap">
                 <div class="y-box-wrap">
-                        <button class="y-btn-addip" id="addip">
-                            <span class="iconfont icon-plus"></span>
+                    <button class="y-btn-addip" id="addip">
+                        <span class="iconfont icon-plus"></span>
+                    </button>
+                    <div class="y-head-icon">
+                        <i class="iconfont icon-yunjisuan"></i>
+                    </div>
+                    <section class="select-box">
+                        <select class="cs-select cs-skin-underline y-form-control optlist">
+                        </select>
+                    </section>
+                    <div class="y-btn-wrap">
+                        <button class="y-btn y-btn-primary" id="configip">
+                            确定
                         </button>
-                        <div class="y-head-icon">
-                            <i class="iconfont icon-yunjisuan"></i>
-                        </div>
-                        <section class="select-box">
-                            <select class="cs-select cs-skin-underline y-form-control optlist">
-                            </select>
-                        </section>
-                        <div class="y-btn-wrap">
-                                <button class="y-btn y-btn-primary" id="configip">
-                                    确定
-                                </button>
-                        </div>            
+                    </div>
                 </div>
-        </div>
-        <div class="mask"></div>
-    </body>
-    <style type="text/css">
-    .y-test-box{
-        width: 100%;
-        /* background-color: #fff; */
-        margin-bottom: 10px;
-    }
-    .y-test-box span{
-        color: #fff;
-    }
-    .y-form-control-test{
-        display: inline-block;
-        border: none;
-        border-bottom: solid 1px #fff;
-        outline: none;
-        /* background-color: #9bbeda; */
-        padding: 10px 0;
-        font-size: 18px;
-        /* color: #fff; */
-        background-color: transparent;
-    }
-    .y-address{
-        width: 20%;
-    }
-    .y-ipcontent{
-        width: 15%;
-    }
-    html{
-        height: 100%;
-        width: 100%;
-    }
-    body{
-        /* background-color: #9bbeda; */
-        background-image: url(./images/bg.jpeg);
-        background-size: 250% auto;
-        background-repeat: no-repeat;
-        -webkit-touch-callout:none;/*系统默认菜单被禁用*/
-
-        -webkit-user-select:none;/*webkit浏览器*/
-
-        -khtml-user-select:none;/*早起浏览器*/
-
-        -moz-user-select:none;/*火狐浏览器*/
-
-        -ms-user-select:none;/*IE浏览器*/
-
-        user-select:none;/*用户是否能够选中文本*/
-    }
-    .mask{
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #534275;
-        opacity: 0.5;
-    }
-    .y-head-icon{
-        margin-top: 3rem;
-        text-align: center;
-        font-size: 24px;
-    }
-    .y-head-icon .iconfont{
-        color: #9bbeda;
-        font-size: 5rem;
-    }
-    .ipselect{
-        margin-top: 3rem;
-        background-color: transparent;
-  	    border: solid 0px;
-         -webkit-appearance: initial;
-         color: #fff;
-         border-bottom: 1px solid #fff;
-    }
-    .option-delete{
-        position: absolute;
-        display: inline-block;
-        boder: none;
-        border: none;
-        right: 0;
-        /* float: right; */
-        padding: 1.2em 0.8em;
-        top: -0.1em;
-    }
-    
-    input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-        color:    #fff;
-    }
-    input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-        color:    #fff;
-    }
-    input::-moz-placeholder { /* Mozilla Firefox 19+ */
-        color:    #fff;
-    }
-    input:-ms-input-placeholder { /* Internet Explorer 10-11 */
-        color:    #fff;
-    }
-
-    input:focus::-webkit-input-placeholder {
-    color: transparent;
-    /* transparent是全透明黑色(black)的速记法，即一个类似rgba(0,0,0,0)这样的值 */
-    }
-    input:focus:-moz-placeholder {
-    color: transparent;
-    }
-    input:focus::-moz-placeholder {
-    color: transparent;
-    }
-    input:focus:-ms-input-placeholder {
-    color: transparent;
-    }
-
-    .y-wrap{
-        /* padding-top: 10%; */
-        width: 100%;
-        height: 100%;
-        position: relative;
-        z-index: 99;
-    }
-    .y-header-title{
-        text-align: center;
-    }
-    .y-box-wrap{
-        margin: 20px 10px;
-    }
-    .y-lable-input{
-        /* display: none; */
-        color: #fff;
-    }
-    .y-form-control{
-        width: 100%;
-        display: block;
-        /* border: none; */
-        /* border-bottom: solid 1px #fff; */
-        outline: none;
-        /* background-color: #9bbeda; */
-        /* padding: 10px 0; */
-        font-size: 18px;
-        /* color: #fff; */
-    }
-    .cs-placeholder,.cs-addicon{
-        position: absolute;
-        bottom: 20px;
-        right: 10px;
-        color: #fff;
-        width: 20px;
-        height: 20px;
-        /* text-align: center; */
-        font-weight: bold;
-    }
-    .cs-addicon{
-        background-color:#9bbeda;
-        text-align: center;
-        line-height: 20px;
-        border: solid 1px #fff;
-        border-radius: 20px; 
-    }
-    .cs-options {
-        color: #fff;
-    }
-    .y-btn-wrap{
-        text-align: center;
-        margin-top: 2rem;
-    }
-    .y-btn{
-        display: inline-block;
-        width: 100%;
-        padding: 14px 12px;
-        margin:12px 0;
-        margin-bottom: 0;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.42857143;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        -ms-touch-action: manipulation;
-        touch-action: manipulation;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        background-image: none;
-        border: 1px solid transparent;
-        border-radius: 30px;
-        background-color: #9bbeda;
-        outline: none;
-        color: #fff;
-    }
-    .y-btn-addip{
-        width: 50px;
-        height: 50px;
-        line-height: 50px;
-        background-color: #9bbeda;
-        color: #fff;
-        text-align: center;
-        /* font-size: 50px; */
-        border-radius: 25px;
-        border: solid 1px #fff;
-    }
-    .y-show{
-        display: block;
-    }
-    .y-hide{
-        display:none;
-    }
-    .y-btn-animation{
-        width: 50px;
-        height: 50px;
-    }
-
-    /* 动画相关的 */
-    .ant-spin-dot {
-        position: relative;
-        display: inline-block;
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-    }
-    .ant-spin {
-        margin-right: 16px;
-    }
-
-    .ant-spin {
-        font-family: Monospaced Number,Chinese Quote,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif;
-        font-size: 14px;
-        line-height: 1.5;
-        color: rgba(0,0,0,.65);
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        color: #1890ff;
-        vertical-align: middle;
-        text-align: center;
-        opacity: 0;
-        position: absolute;
-        -webkit-transition: -webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
-        transition: -webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
-        transition: transform .3s cubic-bezier(.78,.14,.15,.86);
-        transition: transform .3s cubic-bezier(.78,.14,.15,.86),-webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
-        display: none;
-    }
-    .ant-spin-spinning {
-        opacity: 1;
-        position: static;
-        display: inline-block;
-    }
-    .ant-spin-dot-spin{
-        -webkit-transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-        transform: rotate(45deg);
-        -webkit-animation: antRotate 1.2s infinite linear;
-        animation: antRotate 1.2s infinite linear;
-    }
-    .ant-spin-dot i:first-child {
-        left: 0;
-        top: 0;
-    }
-    .ant-spin-dot i:nth-child(2) {
-        right: 0;
-        top: 0;
-        -webkit-animation-delay: .4s;
-        animation-delay: .4s;
-    }
-    .ant-spin-dot i:nth-child(3) {
-        right: 0;
-        bottom: 0;
-        -webkit-animation-delay: .8s;
-        animation-delay: .8s;
-    }
-    .ant-spin-dot i:nth-child(4) {
-        left: 0;
-        bottom: 0;
-        -webkit-animation-delay: 1.2s;
-        animation-delay: 1.2s;
-    }
-    .ant-spin-dot i {
-        width: 9px;
-        height: 9px;
-        border-radius: 100%;
-        background-color: #1890ff;
-        -webkit-transform: scale(.75);
-        -ms-transform: scale(.75);
-        transform: scale(.75);
-        display: block;
-        position: absolute;
-        opacity: .3;
-        -webkit-animation: antSpinMove 1s infinite linear alternate;
-        animation: antSpinMove 1s infinite linear alternate;
-        -webkit-transform-origin: 50% 50%;
-        -ms-transform-origin: 50% 50%;
-        transform-origin: 50% 50%;
-    }
-    .ripple {
-        position:absolute;
-        background:#9bbeda;
-        border-radius:100%;
-        transform:scale(0);
-        pointer-events:none;
-    }
-    .ripple.show {
-        animation:ripple .5s ease-out;
-    }
-    @keyframes ripple {
-        to {
-            transform:scale(2);
-            /* opacity:0; */
+            </div>
+            <div class="mask"></div>
+        </body>
+        <style type="text/css">
+            .y-test-box{
+                width: 100%;
+                /* background-color: #fff; */
+                margin-bottom: 10px;
+            }
+        .y-test-box span{
+            color: #fff;
         }
-    }
-    @-webkit-keyframes antSpinMove {
-        to {
-            opacity: 1
-        }
-    }
-
-    @keyframes antSpinMove {
-        to {
-            opacity: 1
-        }
-    }
-    @-webkit-keyframes antRotate {
-        to {
-            -webkit-transform: rotate(405deg);
-            transform: rotate(405deg)
-        }
-    }
-
-    @keyframes antRotate {
-        to {
-            -webkit-transform: rotate(405deg);
-            transform: rotate(405deg)
-        }
-    }
-    
-    /* 小屏幕（平板，大于等于 768px） */
-    @media (min-width:  400px) {
-        body{
-             /* background-color: #9bbeda; */
-            background-image: url(./images/bg.jpeg);
-            /* background-size: 250% auto; */
-            background-size: cover;
-            background-repeat: no-repeat;
-            overflow-x: hidden;
+        .y-form-control-test{
+            display: inline-block;
             border: none;
+            border-bottom: solid 1px #fff;
+            outline: none;
+            /* background-color: #9bbeda; */
+            padding: 10px 0;
+            font-size: 18px;
+            /* color: #fff; */
+            background-color: transparent;
         }
+        .y-address{
+            width: 20%;
+        }
+        .y-ipcontent{
+            width: 15%;
+        }
+        html{
+            height: 100%;
+            width: 100%;
+        }
+        body{
+            /* background-color: #9bbeda; */
+            background-image: url(./images/bg.jpeg);
+            background-size: 250% auto;
+            background-repeat: no-repeat;
+            -webkit-touch-callout:none;/*系统默认菜单被禁用*/
+            
+            -webkit-user-select:none;/*webkit浏览器*/
+            
+            -khtml-user-select:none;/*早起浏览器*/
+            
+            -moz-user-select:none;/*火狐浏览器*/
+            
+            -ms-user-select:none;/*IE浏览器*/
+            
+            user-select:none;/*用户是否能够选中文本*/
+        }
+        .mask{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #534275;
+            opacity: 0.5;
+        }
+        .y-head-icon{
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 24px;
+        }
+        .y-head-icon .iconfont{
+            color: #9bbeda;
+            font-size: 5rem;
+        }
+        .ipselect{
+            margin-top: 3rem;
+            background-color: transparent;
+            border: solid 0px;
+            -webkit-appearance: initial;
+            color: #fff;
+            border-bottom: 1px solid #fff;
+        }
+        .option-delete{
+            position: absolute;
+            display: inline-block;
+            boder: none;
+            border: none;
+            right: 0;
+            /* float: right; */
+            padding: 1.2em 0.8em;
+            top: -0.1em;
+        }
+        
+        input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+            color:    #fff;
+        }
+        input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+            color:    #fff;
+        }
+        input::-moz-placeholder { /* Mozilla Firefox 19+ */
+            color:    #fff;
+        }
+        input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+            color:    #fff;
+        }
+        
+        input:focus::-webkit-input-placeholder {
+            color: transparent;
+            /* transparent是全透明黑色(black)的速记法，即一个类似rgba(0,0,0,0)这样的值 */
+        }
+        input:focus:-moz-placeholder {
+            color: transparent;
+        }
+        input:focus::-moz-placeholder {
+            color: transparent;
+        }
+        input:focus:-ms-input-placeholder {
+            color: transparent;
+        }
+        
         .y-wrap{
             /* padding-top: 10%; */
             width: 100%;
             height: 100%;
             position: relative;
             z-index: 99;
-            padding: 0 50%;
-            padding-top: 20px;
+        }
+        .y-header-title{
+            text-align: center;
         }
         .y-box-wrap{
-            min-height: 20px;
-            padding: 19px;
-            margin-bottom: 20px;
-            background-color: #f5f5f5;
-            border: 1px solid #e3e3e3;
-            border-radius: 4px;
-            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
-            box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
-            border-radius: 3px;
-            -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background: rgba(255,255,255, 0.2);
-            width: 400px;
-            margin-left: -220px;
+            margin: 20px 10px;
         }
-        div.cs-skin-underline {
-            font-size: 1.2em;
+        .y-lable-input{
+            /* display: none; */
+            color: #fff;
         }
-    }
-    /* 中等屏幕（桌面显示器，大于等于 992px） */
-    @media (max-height: 400px) {
-        body {
+        .y-form-control{
+            width: 100%;
+            display: block;
+            /* border: none; */
+            /* border-bottom: solid 1px #fff; */
+            outline: none;
             /* background-color: #9bbeda; */
-            background-image: url(./images/bg.jpeg);
-            background-size: auto 200%;
-            /* background-size: cover; */
-            background-repeat: no-repeat;
-            /* overflow: hidden; */
-            border: none;
+            /* padding: 10px 0; */
+            font-size: 18px;
+            /* color: #fff; */
+        }
+        .cs-placeholder,.cs-addicon{
+            position: absolute;
+            bottom: 20px;
+            right: 10px;
+            color: #fff;
+            width: 20px;
+            height: 20px;
+            /* text-align: center; */
+            font-weight: bold;
+        }
+        .cs-addicon{
+            background-color:#9bbeda;
+            text-align: center;
+            line-height: 20px;
+            border: solid 1px #fff;
+            border-radius: 20px;
+        }
+        .cs-options {
+            color: #fff;
+        }
+        .y-btn-wrap{
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .y-btn{
+            display: inline-block;
+            width: 100%;
+            padding: 14px 12px;
+            margin:12px 0;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 30px;
+            background-color: #9bbeda;
+            outline: none;
+            color: #fff;
+        }
+        .y-btn-addip{
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            background-color: #9bbeda;
+            color: #fff;
+            text-align: center;
+            /* font-size: 50px; */
+            border-radius: 25px;
+            border: solid 1px #fff;
+        }
+        .y-show{
+            display: block;
+        }
+        .y-hide{
+            display:none;
+        }
+        .y-btn-animation{
+            width: 50px;
+            height: 50px;
+        }
+        
+        /* 动画相关的 */
+        .ant-spin-dot {
+            position: relative;
+            display: inline-block;
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+        }
+        .ant-spin {
+            margin-right: 16px;
+        }
+        
+        .ant-spin {
+            font-family: Monospaced Number,Chinese Quote,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(0,0,0,.65);
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
             padding: 0;
+            list-style: none;
+            color: #1890ff;
+            vertical-align: middle;
+            text-align: center;
+            opacity: 0;
+            position: absolute;
+            -webkit-transition: -webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
+            transition: -webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
+            transition: transform .3s cubic-bezier(.78,.14,.15,.86);
+            transition: transform .3s cubic-bezier(.78,.14,.15,.86),-webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
+            display: none;
         }
-    }
-
-    /* 大屏幕（大桌面显示器，大于等于 1200px） */
-    @media (min-width:  1200px) { 
-        
-    }
-</style>
-<script src="./static/js/classie.js"></script>
-<script src="./static/js/selectFx.js"></script>
-<script>
-    $(function(){
-        //检测屏幕的高度
-        $('.mask').height($(document).height());
-        //先根据缓存渲染select
-        renderselect();
-        $(".option-delete").click(function(){
-            //删除localstorage中相应的东西
-            var iplist = JSON.parse(localStorage.getItem('iplist'));
-            var ipindex = iplist.indexOf($(this).parents("span").text());
-            iplist.splice(ipindex,1)
-            localStorage.setItem('iplist', JSON.stringify(iplist));
-            $(this).parents("li").remove();
-        })
-        $("#addip").click(function(){
-            //将ip加入localstorage中
-            var ipstr = $('.y-placeholder').val();
-            if(ipstr !== ''){
-                if (localStorage.getItem('iplist')) {
-                    var iplist = JSON.parse(localStorage.getItem('iplist'));
-                    //如果已经存在则不添加
-                    if(iplist.indexOf(ipstr) == -1){
-                        console.log("ip不存在")
-                        iplist.push(ipstr);
-                        localStorage.setItem('iplist', JSON.stringify(iplist));
-                    }else{
-                        console.log("ip已存在")
-                    }   
-                }else{
-                    var testarr = [];
-                    localStorage.setItem('iplist', JSON.stringify(testarr));
-                    var iplist = JSON.parse(localStorage.getItem('iplist'));
-                    iplist.push(ipstr);
-                    localStorage.setItem('iplist', JSON.stringify(iplist));
-                }
-            }
-            renderselect();
-        })
-        
-    })
-    
-    $("#configip").click(function(e){
-        var event = e;
-        //将按钮设置成loading状态
-        // $(this).addClass("y-btn-animation");
-        // $(this).html("<div class='ant-spin ant-spin-spinning'><span class='ant-spin-dot ant-spin-dot-spin'><i></i><i></i><i></i><i></i></span></div>");
-        addRippleEffect(event);
-        
-
-    })
-   
-    var addRippleEffect = function (e) {
-        var target = e.target;
-        var elewrap = document.querySelector('.y-wrap')
-        var rect = elewrap.getBoundingClientRect();
-        var ripple = target.querySelector('.ripple');
-        if (!ripple) {
-            ripple = document.createElement('span');
-            ripple.className = 'ripple'
-            ripple.style.height = ripple.style.width = Math.max(rect.width, rect.height) + 'px'
-            target.appendChild(ripple);
+        .ant-spin-spinning {
+            opacity: 1;
+            position: static;
+            display: inline-block;
         }
-        ripple.classList.remove('show');
-        var top = e.pageY - rect.top - ripple.offsetHeight / 2 - document.body.scrollTop;
-        var left = e.pageX - rect.left - ripple.offsetWidth / 2 - document.body.scrollLeft;
-        ripple.style.top = top + 'px'
-        ripple.style.left = left + 'px'
-        ripple.classList.add('show');
-
-        var ipstr = $('.y-placeholder').val();
-        var reg = /[^:]*:([^:]*)/;
-        ipstr=ipstr.replace(reg,"$1");
-        var ipurl = 'http://'+ipstr+'/cu'
-        operationDatatest(ipurl,'get')
-        .then(function(data,status,xhr){
-            console.log(xhr.status)
-            if(xhr.status == 200){
-                window.location.href=ipurl;
-            }else{
-                location.reload();
+        .ant-spin-dot-spin{
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+            -webkit-animation: antRotate 1.2s infinite linear;
+            animation: antRotate 1.2s infinite linear;
+        }
+        .ant-spin-dot i:first-child {
+            left: 0;
+            top: 0;
+        }
+        .ant-spin-dot i:nth-child(2) {
+            right: 0;
+            top: 0;
+            -webkit-animation-delay: .4s;
+            animation-delay: .4s;
+        }
+        .ant-spin-dot i:nth-child(3) {
+            right: 0;
+            bottom: 0;
+            -webkit-animation-delay: .8s;
+            animation-delay: .8s;
+        }
+        .ant-spin-dot i:nth-child(4) {
+            left: 0;
+            bottom: 0;
+            -webkit-animation-delay: 1.2s;
+            animation-delay: 1.2s;
+        }
+        .ant-spin-dot i {
+            width: 9px;
+            height: 9px;
+            border-radius: 100%;
+            background-color: #1890ff;
+            -webkit-transform: scale(.75);
+            -ms-transform: scale(.75);
+            transform: scale(.75);
+            display: block;
+            position: absolute;
+            opacity: .3;
+            -webkit-animation: antSpinMove 1s infinite linear alternate;
+            animation: antSpinMove 1s infinite linear alternate;
+            -webkit-transform-origin: 50% 50%;
+            -ms-transform-origin: 50% 50%;
+            transform-origin: 50% 50%;
+        }
+        .ripple {
+            position:absolute;
+            background:#9bbeda;
+            border-radius:100%;
+            transform:scale(0);
+            pointer-events:none;
+        }
+        .ripple.show {
+            animation:ripple .5s ease-out;
+        }
+        @keyframes ripple {
+            to {
+                transform:scale(2);
+                /* opacity:0; */
             }
+        }
+        @-webkit-keyframes antSpinMove {
+            to {
+                opacity: 1
+            }
+        }
+        
+        @keyframes antSpinMove {
+            to {
+                opacity: 1
+            }
+        }
+        @-webkit-keyframes antRotate {
+            to {
+                -webkit-transform: rotate(405deg);
+                transform: rotate(405deg)
+            }
+        }
+        
+        @keyframes antRotate {
+            to {
+                -webkit-transform: rotate(405deg);
+                transform: rotate(405deg)
+            }
+        }
+        
+        /* 小屏幕（平板，大于等于 768px） */
+        @media (min-width:  400px) {
+            body{
+                /* background-color: #9bbeda; */
+                background-image: url(./images/bg.jpeg);
+                /* background-size: 250% auto; */
+                background-size: cover;
+                background-repeat: no-repeat;
+                overflow-x: hidden;
+                border: none;
+            }
+            .y-wrap{
+                /* padding-top: 10%; */
+                width: 100%;
+                height: 100%;
+                position: relative;
+                z-index: 99;
+                padding: 0 50%;
+                padding-top: 20px;
+            }
+            .y-box-wrap{
+                min-height: 20px;
+                padding: 19px;
+                margin-bottom: 20px;
+                background-color: #f5f5f5;
+                border: 1px solid #e3e3e3;
+                border-radius: 4px;
+                -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+                box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+                border-radius: 3px;
+                -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                background: rgba(255,255,255, 0.2);
+                width: 400px;
+                margin-left: -220px;
+            }
+            div.cs-skin-underline {
+                font-size: 1.2em;
+            }
+        }
+        /* 中等屏幕（桌面显示器，大于等于 992px） */
+        @media (max-height: 400px) {
+            body {
+                /* background-color: #9bbeda; */
+                background-image: url(./images/bg.jpeg);
+                background-size: auto 200%;
+                /* background-size: cover; */
+                background-repeat: no-repeat;
+                /* overflow: hidden; */
+                border: none;
+                padding: 0;
+            }
+        }
+        
+        /* 大屏幕（大桌面显示器，大于等于 1200px） */
+        @media (min-width:  1200px) {
             
-        },function(err){
-            location.reload();
-        })
-        // setTimeout(function(){
-        //         window.location.href="http://172.20.156.168/cu";                
-        //     },200)
-        return false;
-    }
-    function operationData(myurl,method,data){
-        return $.ajax({
-                    type:method,            
-                    url:myurl,                                           
-                    data:data,
-                })
-    }
-    function operationDatatest(myurl,method){
-        return $.ajax({
-                    type:method,            
-                    url:myurl
-                })
-    }
-    function renderselect(){
-        $('.select-box').html("<select class='cs-select cs-skin-underline y-form-control optlist'></select>");
-        if (localStorage.getItem('iplist')) {
+        }
+        </style>
+        <script src="./static/js/classie.js"></script>
+        <script src="./static/js/selectFx.js"></script>
+        <script>
+            $(function(){
+              //检测上次的记录跳转
+              if(localStorage.getItem('lastip')){
+              var ipstr = localStorage.getItem('lastip');
+              var ipurl = 'http://'+ipstr+'/cu';
+              operationDatatest(ipurl,'get')
+              .then(function(data,status,xhr){
+                    if(xhr.status == 200){
+                    //跳转前向端发消息
+                    getCUAdress('http://'+ipstr+'/');
+                    window.location.href=ipurl;
+                    
+                    }else{
+                    return;
+                    }
+                    
+                    },function(err){
+                    location.reload();
+                    })
+              }
+              
+              //检测屏幕的高度
+              $('.mask').height($(document).height());
+              //先根据缓存渲染select
+              renderselect();
+              $(".option-delete").click(function(){
+                                        //删除localstorage中相应的东西
+                                        var iplist = JSON.parse(localStorage.getItem('iplist'));
+                                        var ipindex = iplist.indexOf($(this).parents("span").text());
+                                        iplist.splice(ipindex,1)
+                                        localStorage.setItem('iplist', JSON.stringify(iplist));
+                                        $(this).parents("li").remove();
+                                        })
+              $("#addip").click(function(){
+                                //将ip加入localstorage中
+                                var ipstr = $('.y-placeholder').val();
+                                if(ipstr !== ''){
+                                if (localStorage.getItem('iplist')) {
+                                var iplist = JSON.parse(localStorage.getItem('iplist'));
+                                //如果已经存在则不添加
+                                if(iplist.indexOf(ipstr) == -1){
+                                console.log("ip不存在")
+                                iplist.push(ipstr);
+                                localStorage.setItem('iplist', JSON.stringify(iplist));
+                                }else{
+                                console.log("ip已存在")
+                                }
+                                }else{
+                                var testarr = [];
+                                localStorage.setItem('iplist', JSON.stringify(testarr));
+                                var iplist = JSON.parse(localStorage.getItem('iplist'));
+                                iplist.push(ipstr);
+                                localStorage.setItem('iplist', JSON.stringify(iplist));
+                                }
+                                }
+                                renderselect();
+                                })
+              
+              })
+              
+              $("#configip").click(function(e){
+                                   var event = e;
+                                   //将按钮设置成loading状态
+                                   // $(this).addClass("y-btn-animation");
+                                   // $(this).html("<div class='ant-spin ant-spin-spinning'><span class='ant-spin-dot ant-spin-dot-spin'><i></i><i></i><i></i><i></i></span></div>");
+                                   addRippleEffect(event);
+                                   
+                                   
+                                   })
+                                   
+                                   var addRippleEffect = function (e) {
+                                       var target = e.target;
+                                       var elewrap = document.querySelector('.y-wrap')
+                                       var rect = elewrap.getBoundingClientRect();
+                                       var ripple = target.querySelector('.ripple');
+                                       if (!ripple) {
+                                           ripple = document.createElement('span');
+                                           ripple.className = 'ripple'
+                                           ripple.style.height = ripple.style.width = Math.max(rect.width, rect.height) + 'px'
+                                           target.appendChild(ripple);
+                                       }
+                                       ripple.classList.remove('show');
+                                       var top = e.pageY - rect.top - ripple.offsetHeight / 2 - document.body.scrollTop;
+                                       var left = e.pageX - rect.left - ripple.offsetWidth / 2 - document.body.scrollLeft;
+                                       ripple.style.top = top + 'px'
+                                       ripple.style.left = left + 'px'
+                                       ripple.classList.add('show');
+                                       
+                                       var ipstr = $('.y-placeholder').val();
+                                       var reg = /[^:]*:([^:]*)/;
+                                       ipstr=ipstr.replace(reg,"$1");
+                                       var ipurl = 'http://'+ipstr+'/cu'
+                                       operationDatatest(ipurl,'get')
+                                       .then(function(data,status,xhr){
+                                             console.log(xhr.status)
+                                             if(xhr.status == 200){
+                                             //跳转前向端发消息
+                                             getCUAdress('http://'+ipstr+'/');
+                                             if(localStorage.getItem('lastip')){
+                                             localStorage.setItem('lastip',ipstr);
+                                             }else{
+                                             localStorage.setItem('lastip',ipstr);
+                                             }
+                                             window.location.href=ipurl;
+                                             
+                                             }else{
+                                             location.reload();
+                                             }
+                                             
+                                             },function(err){
+                                             location.reload();
+                                             })
+                                             return false;
+                                   }
+        function getCUAdress(ipstr){
+            window.app.getCUAdress(JSON.stringify({url:ipstr}))
+        }
+        function operationData(myurl,method,data){
+            return $.ajax({
+                          type:method,            
+                          url:myurl,                                           
+                          data:data,
+                          })
+        }
+        function operationDatatest(myurl,method){
+            return $.ajax({
+                          type:method,            
+                          url:myurl
+                          })
+        }
+        function renderselect(){
+            $('.select-box').html("<select class='cs-select cs-skin-underline y-form-control optlist'></select>");
+            if (localStorage.getItem('iplist')) {
                 var opthtml='',iplist = JSON.parse(localStorage.getItem('iplist'));
                 iplist.forEach(function(value, index){
-                    if(index == 0){
-                        opthtml = opthtml + "<option selected>"+value+"</option>";
-                    }else{
-                        opthtml = opthtml + "<option value='"+index+"'>"+value+"</option>";
-                    }  
-                })
-                $(".optlist").html(opthtml);
+                               if(index == 0){
+                               opthtml = opthtml + "<option selected>"+value+"</option>";
+                               }else{
+                               opthtml = opthtml + "<option value='"+index+"'>"+value+"</option>";
+                               }  
+                               })
+                               $(".optlist").html(opthtml);
             }
-        [].slice.call( document.querySelectorAll( 'select.cs-select' ) ).forEach( function(el) {	
-            console.log(el)
-            new SelectFx(el);
-        } );
-        $('.cs-placeholder').click(function(){
-            $(this).toggleClass("main");
-        })
-    }
-</script>
+            [].slice.call( document.querySelectorAll( 'select.cs-select' ) ).forEach( function(el) {	
+                                                                                     console.log(el)
+                                                                                     new SelectFx(el);
+                                                                                     } );
+                                                                                     $('.cs-placeholder').click(function(){
+                                                                                                                $(this).toggleClass("main");
+                                                                                                                })
+        }
+        </script>
 </html>

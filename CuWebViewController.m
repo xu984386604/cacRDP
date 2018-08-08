@@ -19,22 +19,21 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     //初始化 http://172.20.156.109/
-    cuIp=@"http://172.20.100.11/";
-    innerCuUrl=@"http://172.20.100.11/";
+    //[vminfo share].cuIp=@"http://172.20.100.11/";
+    //innerCuUrl=@"http://172.20.100.11/";
     innerNet=@"1"; //默认外网
-    [vminfo share].cuIp=cuIp;
-    _isNotFirstLoad = NO;
-    
+    _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [super viewDidLoad];
     
     [self loadLocalHTML:@"ipconfig" inDirectory:@"ipconfig"];
     //判断内外网
-    //[self is_External_network];
+    //[self isExternalNetwork];
     
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stoppostMessageToservice:) name:@"stoppostMessageToservice" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postMessageToService:) name:@"postMessageToservice" object:nil];
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isExternalNetwork) name:@"isExternalNetwork" object:nil];
     _connectInfo = [vminfo share];
 }
 
@@ -103,7 +102,6 @@
     }
     [[bookmark params] setInt:height*2 forKey:@"width"];
     [[bookmark params] setInt:width*2 forKey:@"height"];
-    
     
     NSLog(@"%@",[bookmark params]);
     RDPSession* session = [[[RDPSession alloc] initWithBookmark:bookmark] autorelease];
@@ -286,7 +284,7 @@
 }
 
 #pragma mark 判断是否是外网
--(void)is_External_network
+-(void) isExternalNetwork
 {
     NSString * urlStr=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/checkNet",innerCuUrl];
     NSURL *myurl=[NSURL URLWithString:urlStr];
@@ -319,7 +317,6 @@
     myrequest2.HTTPMethod=@"POST";
     myrequest2.timeoutInterval=3.0;
     
-    
     [myrequest2 setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
     NSDictionary *json=@{
@@ -328,7 +325,6 @@
     
     NSData *data=[NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:nil];
     myrequest2.HTTPBody=data;
-    
     
     NSData *recvData=[NSURLConnection sendSynchronousRequest:myrequest2 returningResponse:nil error:nil];
     
@@ -340,36 +336,19 @@
     
     if([codenum isEqualToNumber:[NSNumber numberWithInteger:800]])
     {
-        NSUserDefaults *mydefaults=[[NSUserDefaults alloc] initWithSuiteName:@"group.ct"];
         if([innerNet isEqualToString:@"1"])
         {
-          [vminfo share].gatewaycheck=@"NO";
+            [vminfo share].gatewaycheck=@"NO";
         }else
         {
             [vminfo share].gatewaycheck=@"YES";
         }
         //加载网页
-        [self loadMyWebview];
-        
-    } else
-    {
-        UIAlertController *myalert=[UIAlertController
-                                    alertControllerWithTitle:@"连接错误"
-                                    message:@"拒绝连接"
-                                    preferredStyle:UIAlertControllerStyleAlert
-                                    ];
-        UIAlertAction *defaultaction=[UIAlertAction actionWithTitle:@"确定"
-                                                              style:UIAlertActionStyleDefault
-                                                            handler:^(UIAlertAction * _Nonnull action) {
-                                                                
-                                                            }];
-        [myalert addAction:defaultaction];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self presentViewController:myalert animated:YES completion:nil];
-        });
-        
-        
+        //[self loadMyWebview];
     }
+    
+    NSString *msg = [innerNet isEqualToString:@"1"] ? @"内网" : @"外网";
+    NSLog(@"当前连接的cu是:%@环境", msg);
 }
 
 #pragma mark sendMessageToDocker
@@ -459,7 +438,7 @@
     return YES;
 }
 
-
+//暂时未使用
 - (void)loadWithUrlStr:(NSString*)urlStr
 {
     if (urlStr.length > 0) {
