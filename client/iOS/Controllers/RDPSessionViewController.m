@@ -18,12 +18,15 @@
 #import "BlockAlertView.h"
 #import "myAlertView.h"
 
+
+
+
 #define TOOLBAR_HEIGHT 30
 
 #define AUTOSCROLLDISTANCE 20
 #define AUTOSCROLLTIMEOUT 0.05
 
-@interface RDPSessionViewController (Private)
+@interface RDPSessionViewController (Private)<MyFloatButtonDelegate>
 -(void)showSessionToolbar:(BOOL)show;
 -(UIToolbar*)keyboardToolbar;
 -(void)initGestureRecognizers;
@@ -62,8 +65,9 @@
         //确保他不会滚动？
         _is_autoscrolling = NO;
         
-        //隐藏系统状态栏
-       
+        //menu显示状态
+        ISShowMenuButton = NO;
+
         
         [UIView setAnimationDelegate:self];
         [UIView setAnimationDidStopSelector:@selector(animationStopped:finished:context:)];
@@ -111,7 +115,7 @@
     [self initGestureRecognizers];
     
     // hide session toolbar
-    [_session_toolbar setFrame:CGRectMake(0.0, -TOOLBAR_HEIGHT, [[self view] bounds].size.width, TOOLBAR_HEIGHT)];
+   // [_session_toolbar setFrame:CGRectMake(0.0, -TOOLBAR_HEIGHT, [[self view] bounds].size.width, TOOLBAR_HEIGHT)];
 }
 
 
@@ -120,36 +124,9 @@
 {
     [super viewDidLoad];
     
-    
-    [self postDataWhenFirstOpenRdp];
+
 }
 
-/*
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return YES;
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    if (![_touchpointer_view isHidden])
-        [_touchpointer_view ensurePointerIsVisible];
-}
-*/
-/*
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_9_0
-- (NSUInteger)supportedInterfaceOrientations
-#else
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations
-#endif
-{
-    return UIInterfaceOrientationMaskLandscape;
-}
-
-- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
-    
-    return UIInterfaceOrientationLandscapeRight;
-}
-*/
 
 
 
@@ -372,6 +349,7 @@
 
 - (void)sessionWillConnect:(RDPSession*)session
 {
+    
     //new add触发器开始计时
     NSLog(@"start....");
     is_timeup=NO;
@@ -432,10 +410,15 @@
 }
 
 
+
+
+
+
+
 - (void)sessionDidConnect:(RDPSession*)session
 {
     //登录成功，设置flag
-    NSLog(@"success connect to server!");
+    NSLog(@"success to connect  message....");
     if (!IOS_VERSION_7_OR_ABOVE)
     {
         CGRect rect=_touchpointer_view.frame;
@@ -457,7 +440,7 @@
     //登陆成功关掉计时器
     if(is_timeup) //计时器没到时才关闭
         [timer invalidate]; //关闭计时器。。。
-    [[self view] makeToast:NSLocalizedString(@"接入云端成功........", @"success connect to server!") duration:ToastDurationNormal position:@"center"];
+    [[self view] makeToast:NSLocalizedString(@"接入云端成功。。。", @"success to connect  message") duration:ToastDurationNormal position:@"center"];
     
     //new add 2缩放
     /*CGAffineTransform mytransform=CGAffineTransformScale(_session_scrollview.transform, 0.8, 0.7);
@@ -489,6 +472,10 @@
     }
     //进入遮挡windows登陆界面的界面
     [self sessionConnected:session];
+    
+    //挂载网盘第一次
+    [self postDataWhenFirstOpenRdp];
+
 }
 
 //new add,计时关闭遮挡windows登陆界面的界面
@@ -499,10 +486,72 @@
     [_connected_view removeFromSuperview];
     [_connected_view autorelease];
     
+    //加载悬浮按钮
+    
+    _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176, 46, 46)];
+    [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176);
+    _myfloatbutton.alpha=0.5;
+    _myfloatbutton.delegate=self;
+    _myfloatbutton.bannerIV.image=[UIImage imageNamed:@"menu.png"];
+
+    [self.view addSubview:_myfloatbutton];
+    
+    _mymenuview=[[MenuView alloc] init];
+
+    _mymenuview.clickMenuButton = ^(NSInteger tag){
+        
+        ISShowMenuButton = YES;
+        [self floatTapAction:nil];
+        [self menuButtonTapAction:tag];
+        
+    };
+
 }
 
-
-
+#pragma mark FloatButton TapAction
+//悬浮按钮的点击事件
+- (void)floatTapAction:(MyFloatButton *)sender
+{
+    if (!ISShowMenuButton) {
+        [UIView animateWithDuration:0.2 animations:^{
+            [_mymenuview showMenuView];
+            _myfloatbutton.isMoving = NO;
+        }];
+    }else
+    {
+        [UIView animateWithDuration:0.2 animations:^{
+            [_mymenuview dismiss];
+            _myfloatbutton.isMoving = YES;
+        }];
+    }
+    ISShowMenuButton = !ISShowMenuButton;
+    
+}
+//处理每个按钮的事件
+-(void)menuButtonTapAction:(NSInteger)tag
+{
+    switch (tag) {
+        case 1:
+            [self toggleKeyboard:nil];
+            break;
+        case 2:
+            [self toggleTouchPointer:nil];
+            break;
+        case 3:
+            [self postData:NO];
+            break;
+        case 4:
+            [self postData:YES];
+            break;
+        case 5:
+            [self disconnectSession:nil];
+            break;
+        default:
+            break;
+    }
+    
+    
+}
 
 - (void)sessionWillDisconnect:(RDPSession*)session
 {
@@ -511,7 +560,7 @@
 //返回最初的界面
 - (void)sessionDidDisconnect:(RDPSession*)session
 {
-    //向服务器发送关闭指令
+    //想服务器发送关闭指令
     
     [self closeOpenRdp];
     
@@ -555,14 +604,15 @@
             NSLog(@"%@",mycode);
         }//else
         
-    }//if
+    }//if
     
     if([[vminfo share].apptype isEqualToString:@"lca"])
     {
         [self sendDockerMessageToService];
     }
+    
 }
-//关闭docker应用的时候，向服务器发送消息
+//关闭docker应用的时候，想服务器发送消息
 -(void)sendDockerMessageToService
 {
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/sendMessageToDockerManager",[vminfo share].cuIp];
@@ -601,10 +651,11 @@
     _session_scrollview.maximumZoomScale = 1;
     _session_scrollview.minimumZoomScale = 0.5;
     
-    //顶部向下偏移20像素
-    _session_scrollview.contentInset=UIEdgeInsetsMake(30, 0, 0, 0);
+    //顶部向下偏移30像素
+//    _session_scrollview.contentInset=UIEdgeInsetsMake(30, 0, 0, 0);
 
     // reset  zoom level and update content size
+    NSLog(@"为甚么你没有缩成0.5");
     //设置画布大小的
     [_session_scrollview setContentSize:view_rect.size];
 
@@ -614,7 +665,7 @@
         [_session_scrollview setZoomScale:0.5];
     // show/hide toolbar
     [_session setToolbarVisible:![[NSUserDefaults standardUserDefaults] boolForKey:@"ui.hide_tool_bar"]];
-    [self showSessionToolbar:[_session toolbarVisible]];
+//    [self showSessionToolbar:[_session toolbarVisible]];
 }
 
 - (void)sessionBitmapContextDidChange:(RDPSession*)session
@@ -669,72 +720,7 @@
         return CGSizeMake(maxSize * 1.6f, maxSize);
     }
 }
-#pragma mark -
-#pragma mark My AlertView
 
--(void)showMyAlert{
-    MyAlertView *alert = [MyAlertView tableAlertWithTitle:@"菜单" cancelButtonTitle:@"取消" numberOfRows:^NSInteger(NSInteger row) {
-        
-        return 2;
-        
-    } andCell:^UITableViewCell *(MyAlertView *tableAlert, NSIndexPath *indexPath) {
-        
-        
-        static NSString *CellIdentifier = @"CellIdentifier";
-        UITableViewCell *cell = [tableAlert.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil){
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-        }
-        
-        // 禁止选中时高亮
-        //cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        //[cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-        if(indexPath.row == 0)
-        {
-            cell.textLabel.text=@"挂载网盘";
-            cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"MLTableAlertCellBg"]];
-            return cell;
-        }
-        if(indexPath.row == 1)
-        {
-            cell.textLabel.text=@"取消挂载";
-            cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"MLTableAlertCellBg"]];
-            return cell;
-        }
-        else{
-            cell.textLabel.text = [NSString stringWithFormat:@"会话%d",(indexPath.row-2) ];
-            cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"MLTableAlertCellBg"]];
-            return cell;
-        }
-        
-    }];
-    
-    [alert configureSelectionBlock:^(NSIndexPath *selindexPath){
-        
-        [self MytableAlertAction:(int)selindexPath.row];
-        
-    } andCompletionBlock:^{
-        
-    }];
-    
-    [alert show];
-}
-
--(void)MytableAlertAction:(int)row
-{
-    switch(row)
-    {
-            
-        case 0:
-            [self postData:NO];
-            break;
-        case 1:
-            [self postData:YES];
-            break;
-        default:
-            NSLog(@"error");
-    }
-}
 
 
 #pragma mark -
@@ -896,7 +882,6 @@
 {
     // if the sys kb is shown but not the advanced kb then toggle the advanced kb
    
-    [self showMyAlert];
 
     
 }
@@ -1077,8 +1062,8 @@
 
 -(void)handleSingle3FingersTap:(UITapGestureRecognizer*)gesture
 {
-    [_session setToolbarVisible:![_session toolbarVisible]];
-    [self showSessionToolbar:[_session toolbarVisible]];
+//    [_session setToolbarVisible:![_session toolbarVisible]];
+//    [self showSessionToolbar:[_session toolbarVisible]];
 }
 
 #pragma mark -

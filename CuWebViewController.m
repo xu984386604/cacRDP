@@ -7,6 +7,7 @@
 //
 
 #import "CuWebViewController.h"
+#import "Bookmark.h"
 
 
 @interface CuWebViewController ()
@@ -36,7 +37,7 @@
     //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isExternalNetwork) name:@"isExternalNetwork" object:nil];
     _connectInfo = [vminfo share];
     
-    //[self checkCookies]; //测试用
+    [self checkCookies]; //测试用
 }
 
 #pragma mark 网页加载
@@ -223,12 +224,11 @@
     NSString *ip=[vminfo share].cuIp;
     NSString *handleUrl = [NSString stringWithFormat:@"%@", ip];
     NSMutableDictionary *jsonData = [NSMutableDictionary dictionary];
-    NSURL *url=[NSURL URLWithString:handleUrl];
-    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
-    myrequest.HTTPMethod=@"POST";
-    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    //NSURL *url=[NSURL URLWithString:handleUrl];
+    //NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
+    
     NSString *mytimestr = [[NSUserDefaults standardUserDefaults] objectForKey:@"oneloginuuid"];
-    //NSLog(@"oneloginuuid:%@", mytimestr);
+    NSLog(@"oneloginuuid:%@", mytimestr);
     
     if ([smsType  isEqual: @"loginMsg"]) {
         handleUrl = [handleUrl stringByAppendingString:@"cu/index.php/Home/Client/updateLoginStatus"];
@@ -244,18 +244,28 @@
         NSLog(@"准备发送recoverMsg信息");
     }
     
-    NSData *sendData = [NSJSONSerialization dataWithJSONObject:jsonData options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest.HTTPBody = sendData;
+    NSLog(@"发起请求的url：%@", handleUrl);
+    [self makeRequestToServer:handleUrl withDictionary:jsonData byHttpMethod:@"POST" msgType:smsType];
+    
+    //NSData *recvData = [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+}
+
+//向服务器发起请求，因是异步执行，故返回的数据不能立即得到，所以需要在回调函数里面进行处理，可以采用在参数里面加一个回调函数的参数传入
+-(void) makeRequestToServer:(NSString*)urlString withDictionary:(NSDictionary*)dic byHttpMethod:(NSString*) method msgType:(NSString*)smsType {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+    [request setHTTPMethod:method];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    NSData *sendData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
+    request.HTTPBody = sendData;
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    [request setHTTPMethod:@"POST"];
-    NSURLSessionDataTask *data = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data,NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    
+    NSURLSessionDataTask *sessionData = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data,NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSLog(@"发送%@信息成功！", smsType);
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         NSLog(@"发送信息的请求返回状态码：%ld", (long)httpResponse.statusCode);
-        if(data !=nil) {
+        if(data) {
             if ([smsType  isEqual: @"loginMsg"]) {
                 NSDictionary *dic=[NSJSONSerialization JSONObjectWithData:data options:NSJSONWritingPrettyPrinted error:nil];
                 NSNumber *mycode=[dic objectForKey:@"code"];
@@ -268,14 +278,26 @@
                     [self callJsLogoff];
                 }
             } else if([smsType  isEqual: @"recoverMsg"]) {
+                NSDictionary *dic=[NSJSONSerialization JSONObjectWithData:data options:NSJSONWritingPrettyPrinted error:nil];
+                NSDictionary *myDic = [dic objectForKey:@"code"];
+                NSNumber *mycode = [myDic objectForKey:@"code"];
+                if ([mycode isEqualToNumber:[NSNumber numberWithLong:800]]) {
+                    NSLog(@"恢复应用信息服务器确认正确！");
+                } else if([mycode isEqualToNumber:[NSNumber numberWithLong:907]]) {
+                    NSLog(@"恢复应用信息服务器确认数据库出问题！");
+                } else if([mycode isEqualToNumber:[NSNumber numberWithLong:941]]) {
+                    NSLog(@"恢复应用信息服务器确认redis出问题！");
+                } else if([mycode isEqualToNumber:[NSNumber numberWithLong:1206]]) {
+                    NSLog(@"恢复应用信息服务器确认更新应用使用记录的state字段失败出问题！");
+                } else {
+                    NSLog(@"恢复应用信息服务器出现不可预料的问题!");
+                }
                 NSLog(@"收到的恢复rdp的返回信息：%@", str);
             }
         }
     }];
-    [data resume]; //如果request任务暂停了，则恢复
-    //NSData *recvData = [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+    [sessionData resume]; //如果request任务暂停了，则恢复
 }
-
 
 //登陆超时处理的函数
 -(void)callJsLogoff
