@@ -15,6 +15,8 @@
 #import "AdvancedKeyboardView.h"
 #import "vminfo.h"
 #import "MyTableAlert.h"
+#import "MyFloatButton.h"
+#import "MenuView.h"
 
 
 #define IOS_VERSION_7_OR_ABOVE (([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)? (YES):(NO))
@@ -92,6 +94,12 @@ BOOL is_closed;
     NSTimer* _mouse_move_event_timer;
     int _mouse_move_events_skipped;
     CGPoint _prev_long_press_position;
+    
+    //悬浮按钮
+    BOOL ISShowMenuButton;
+    MyFloatButton * _myfloatbutton;  //悬浮按钮
+    MenuView * _mymenuview;          //显示的menu
+    
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil session:(RDPSession*)session;

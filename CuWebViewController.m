@@ -20,8 +20,8 @@
     
     // Do any additional setup after loading the view.
     //初始化
-    cuIp=@"http://172.20.156.109/";
-    innerCuUrl=@"http://172.20.156.109/";
+    cuIp=@"http://172.20.156.168/";
+    innerCuUrl=@"http://172.20.156.168/";
     innerNet=@"1"; //默认外网
     
     [vminfo share].cuIp=cuIp;

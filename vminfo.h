@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface vminfo : NSObject
 
@@ -46,6 +47,8 @@
 
 
 @property (nonatomic,copy) NSString * cuIp;
+
+@property (nonatomic,assign) CGPoint mypoint;
 
 
 +(instancetype) share;
