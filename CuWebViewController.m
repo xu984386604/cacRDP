@@ -19,11 +19,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //初始化 http://172.20.156.109/
+    //[vminfo share].cuIp=@"http://172.20.100.11/";
+    //innerCuUrl=@"http://172.20.100.11/";
+    innerNet=@"1"; //默认外网
+    _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
+    [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
     
-    
+    [self loadLocalHTML:@"ipconfig" inDirectory:@"ipconfig"];
     //判断内外网
     //[self is_External_network];
-    
     
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
