@@ -9,14 +9,13 @@
 #import "JSCallOc.h"
 
 @implementation JSCallOc
+
 /*****************************
  
  **parameter：json数据
  **function：解析并且保存json数据
  
  *****************************/
-
-
 -(void)AcceptTheDataFromJs:(NSString *)data
 {
    NSData *str=[data dataUsingEncoding:NSUTF8StringEncoding];
@@ -27,7 +26,7 @@
     NSLog(@"%@",_dic);
    
     //解析json数据保存到vminfo中
-   vminfo * myinfo = [vminfo share];
+    vminfo * myinfo = [vminfo share];
     myinfo.tsip=[_dic objectForKey:@"tsip"];
     myinfo.tsport=[_dic objectForKey:@"tsport"];
     myinfo.tspwd=[_dic objectForKey:@"tspwd"];
@@ -37,12 +36,13 @@
     myinfo.vmpasswd=[_dic objectForKey:@"vmpsswd"];
     myinfo.vmusername=[_dic objectForKey:@"vmusername"];
     NSString* remoteProgram=[_dic objectForKey:@"remoteProgram"];
+    myinfo.appid = [_dic objectForKey:@"id"];
+    myinfo.uid = [_dic objectForKey:@"username"];
 
      //docker应用处理
     NSString *apptype=[_dic objectForKey:@"appType"];
     if([apptype isEqualToString:@"lca"])
     {
-    
         myinfo.dockerId=[_dic objectForKey:@"docker_id"];
         myinfo.dockerIp=[_dic objectForKey:@"docker_ip"];
         myinfo.dockerVncPwd=[_dic objectForKey:@"docker_vncpwd"];
@@ -53,31 +53,25 @@
     }
     
     myinfo.remoteProgram=[NSString  stringWithFormat:@"opener.exe %@", remoteProgram];
-    
-    
-    
     //接收的数据不为空则可以调用来打开RDP
     [self openRdp];
-    
 }
+
 /*****************************
  
  **parameter：无
  **function：向消息中心发送“openRdp”的消息，cuWebVC中用于处理该事件
  
  *****************************/
-
-
 -(void)openRdp
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"openRdp" object:NULL];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"openRdp" object:nil];
 }
 
 /*******
  **parameter：json数据
  **function：解析json数据中的uid，向服务器发送心跳
 *******/
-
 -(void)AcceptUidAndKeepHeartBeat:(NSString *)data
 {
     //解析保存uid
@@ -89,20 +83,49 @@
     
     //解析出了uid，通过vminfo共享数据
     [vminfo share].uid=uid;
-    //发送通知，想服务器发送消息
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:NULL];
+    //发送通知，向服务器发送消息
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"loginMsg"];
 
 }
 //注销的时候，停止发送心跳
 -(void)StopHeartBeat:(id)num
 {
-    
-     [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:nil];
+     [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"loginMsg"];
 }
 
-
-
-
-
+//获取cu地址
+-(void) getCUAddress:(NSString *)ipUrl {
+    NSData *str=[ipUrl dataUsingEncoding:NSUTF8StringEncoding];
+    NSError * err;
+    NSDictionary *mydic=[NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
+    NSString *url=[mydic objectForKey:@"url"];
+    [vminfo share].cuIp = url;
+    NSLog(@"收到的ipurl:%@", url);
+    
+    
+    //默认处理这种格式的字符串“http://google.com/”
+    NSMutableString *mUrl = [NSMutableString stringWithString:url];
+    if ([mUrl containsString:@"http://"]) {
+        [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"http://"]];
+    }
+    if ([mUrl containsString:@"https://"]) {
+        [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"https://"]];
+    }
+    if ([mUrl containsString:@"/"]) {
+        [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"/"]];
+    }
+    
+    int isInnerIP = [CommonUtils isInnerIP:mUrl];
+    //-1代表错误，1代表外网，0代表内网
+    if(isInnerIP == -1) {
+        NSLog(@"无法判断内外网！凉凉..........");
+    } else if(isInnerIP == 0) {
+        [vminfo share].gatewaycheck=@"NO";
+        NSLog(@"是内网！");
+    } else if(isInnerIP == 1) {
+        [vminfo share].gatewaycheck=@"YES";
+        NSLog(@"是外网！");
+    }
+}
 
 @end

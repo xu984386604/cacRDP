@@ -19,6 +19,12 @@
 #import "NavigationController.h"
 #import  "CuWebViewController.h"
 
+@interface AppDelegate()
+{
+    //timer是用于后台任务的执行
+    NSTimer *timer;
+}
+@end
 
 @implementation AppDelegate
 
@@ -28,7 +34,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    
     // Set default values for most NSUserDefaults 设置默认
     [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Defaults" ofType:@"plist"]]];
     
@@ -38,63 +43,11 @@
     ViewController *vc = [[[ViewController alloc] initWithNibName:@"ViewController" bundle:nil] autorelease];
     vc.title = @"cos客户端";
     
-//    aaaViewController *vc = [[[aaaViewController alloc] initWithNibName:@"ViewController" bundle:nil] autorelease];
-    NavigationController *navc = [[[NavigationController alloc]initWithRootViewController:vc] autorelease];
-
-//       NSArray* tabItems = [NSArray arrayWithObjects:navc, nil];
-    
-    
-    
     CuWebViewController *myCuVC=[[CuWebViewController alloc] init];
     _window.rootViewController = myCuVC;
-    
-//        [_window addSubview:[_viewController view]];
-//    [_tabBarController setViewControllers:tabItems];
-//    if ([_window respondsToSelector:@selector(setRootViewController:)])
-//        [_window setRootViewController:_tabBarController];
-//    else
-//        [_window addSubview:[_tabBarController view]];
-//    
-    
     [_window makeKeyAndVisible];
     
     return YES;
-    
-
-    
-    
-//    
-//	// Set default values for most NSUserDefaults
-//	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Defaults" ofType:@"plist"]]];
-//
-//    // init global settings
-//    SetSwapMouseButtonsFlag([[NSUserDefaults standardUserDefaults] boolForKey:@"ui.swap_mouse_buttons"]);
-//    SetInvertScrollingFlag([[NSUserDefaults standardUserDefaults] boolForKey:@"ui.invert_scrolling"]);
-//    
-//    // create bookmark view and navigation controller
-//    BookmarkListController* bookmarkListController = [[[BookmarkListController alloc] initWithNibName:@"BookmarkListView" bundle:nil] autorelease];
-//    UINavigationController* bookmarkNavigationController = [[[UINavigationController alloc] initWithRootViewController:bookmarkListController] autorelease];	
-//
-//    // create app settings view and navigation controller
-//    AppSettingsController* appSettingsController = [[[AppSettingsController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
-//    UINavigationController* appSettingsNavigationController = [[[UINavigationController alloc] initWithRootViewController:appSettingsController] autorelease];	
-//     
-//    // create help view controller
-//    HelpController* helpViewController = [[[HelpController alloc] initWithNibName:nil bundle:nil] autorelease];
-//
-//    // create about view controller
-//    AboutController* aboutViewController = [[[AboutController alloc] initWithNibName:nil bundle:nil] autorelease];
-//     
-//    // add tab-bar controller to the main window and display everything
-//    NSArray* tabItems = [NSArray arrayWithObjects:bookmarkNavigationController, appSettingsNavigationController, helpViewController, aboutViewController, nil];
-//    [_tabBarController setViewControllers:tabItems];
-//    if ([_window respondsToSelector:@selector(setRootViewController:)])
-//        [_window setRootViewController:_tabBarController];
-//    else
-//        [_window addSubview:[_tabBarController view]];
-//    [_window makeKeyAndVisible];	   
-//
-//    return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -105,20 +58,57 @@
      */
 }
 
+- (void)cacSBStartBackgroundTask{
+    timer = [NSTimer scheduledTimerWithTimeInterval:300.0f target:self selector:@selector(sendMessage) userInfo:nil repeats:YES];
+}
+
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    /*
-     Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-     If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-     */
+    //开启一个后台任务
+    taskId = [application beginBackgroundTaskWithExpirationHandler:^{
+        //结束指定的任务
+        [application endBackgroundTask:taskId];
+    }];
+    [self cacSBStartBackgroundTask];
+}
+
+-(void)sendMessage {
+    NSString *ip=[vminfo share].cuIp;
+    NSString *handleUrl = [NSString stringWithFormat:@"%@", ip];
+    NSMutableDictionary *jsonData = [NSMutableDictionary dictionary];
+    NSURL *url=[NSURL URLWithString:handleUrl];
+    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
+    myrequest.HTTPMethod=@"POST";
+    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    
+    handleUrl = [handleUrl stringByAppendingString:@"cu/index.php/Home/Client/UpdateAppUseStatus"];
+    jsonData = [vminfo share].multiRdpRecoverInfo;
+    NSLog(@"AppDelegate:准备发送recoverMsg信息");
+    
+    NSData *sendData = [NSJSONSerialization dataWithJSONObject:jsonData options:NSJSONWritingPrettyPrinted error:nil];
+    myrequest.HTTPBody = sendData;
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    [request setHTTPMethod:@"POST"];
+    NSURLSessionDataTask *data = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data,NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        NSLog(@"AppDelegate:发送recoverMsg信息成功！");
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        NSLog(@"AppDelegate:发送recoverMsg信息的请求返回状态码：%ld", (long)httpResponse.statusCode);
+        if(data !=nil) {
+            NSLog(@"AppDelegate:收到的恢复rdp的返回信息：%@", str);
+        }
+    }];
+    [data resume]; //如果request任务暂停了，则恢复
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    /*
-     Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-     */
-    // cancel disconnect timer
+    //进入前台后将发送的心跳的后台计时器失效，之后cuwebcontroller的runloop的心跳信息的timer会马上执行最近一次的任务
+    [timer invalidate];
+    timer = nil;
+    NSLog(@"AppDelegate:停止发送recoverMsg信息！");
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -174,16 +164,8 @@
             //mycode的值是800表示正确关闭
             NSLog(@"%@",mycode);
         }//else
-        
     }//if
-    
-    
-    
 }
-
-
-
-
 
 - (void)dealloc
 {

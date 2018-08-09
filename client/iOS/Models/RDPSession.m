@@ -207,6 +207,7 @@ NSString* TSXSessionDidFailToConnectNotification = @"TSXSessionDidFailToConnect"
     settings->AudioCapture = FALSE;
 	
 	[self mfi]->session = self;
+    self.isClosed = [self mfi]->connection_state;//rdp状态信息的暴露
 	return self;
 
 out_free:
@@ -384,6 +385,7 @@ out_free:
     [self performSelectorOnMainThread:@selector(sessionWillConnect) withObject:nil waitUntilDone:YES];
     int result_code = ios_run_freerdp(_freerdp);
     [self mfi]->connection_state = TSXConnectionDisconnected;
+    self.isClosed = [self mfi]->connection_state;//rdp状态信息的暴露，可以在此发送断开连接的信息
     [self performSelectorOnMainThread:@selector(runSessionFinished:) withObject:[NSNumber numberWithInt:result_code] waitUntilDone:YES];
 
     [pool release];
@@ -392,6 +394,7 @@ out_free:
 // Main thread.
 - (void)runSessionFinished:(NSNumber*)result
 {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"recoverMsg"];
 	int result_code = [result intValue];
 	
 	switch (result_code)

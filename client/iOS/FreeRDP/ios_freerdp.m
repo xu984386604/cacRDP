@@ -197,6 +197,7 @@ int ios_run_freerdp(freerdp* instance)
 		if (freerdp_check_fds(instance) != true)
 		{
 			NSLog(@"%s: inst->rdp_check_fds failed.", __func__);
+            
 			break;
 		}
 		

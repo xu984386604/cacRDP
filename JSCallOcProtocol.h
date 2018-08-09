@@ -14,6 +14,6 @@
 JSExportAs(openApp, -(void)AcceptTheDataFromJs:(NSString*)data);
 JSExportAs(setUserInfo, -(void)AcceptUidAndKeepHeartBeat:(NSString *)data);
 JSExportAs(logOff, -(void)StopHeartBeat:(id)num);
-
+JSExportAs(getCUAdress, -(void)getCUAddress:(NSString *)ipUrl);
 
 @end
