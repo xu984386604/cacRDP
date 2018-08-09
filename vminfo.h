@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import "client/iOS/Models/RDPSession.h"
 
 @interface vminfo : NSObject
 

@@ -18,18 +18,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Do any additional setup after loading the view.
-    //初始化
-    cuIp=@"http://172.20.156.168/";
-    innerCuUrl=@"http://172.20.156.168/";
-    innerNet=@"1"; //默认外网
-    
-    [vminfo share].cuIp=cuIp;
-    
     
     //判断内外网
-    [self is_External_network];
-//    [self isFirstLoad];
+    //[self is_External_network];
     
     
     //注册观察者处理事件
