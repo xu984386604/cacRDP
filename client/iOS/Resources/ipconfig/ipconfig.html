@@ -4,590 +4,690 @@
         <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                    <title>配置IP</title>
-                    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.0/jquery.min.js"></script>
-                    <link rel="stylesheet" type="text/css" href="./static/css/iconfont.css">
+                    <title>Document</title>
+                    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+                        
                         <link rel="stylesheet" type="text/css" href="./static/css/normalize.css" />
-                        <link rel="stylesheet" type="text/css" href="./static/css/cs-select.css" />
-                        <link rel="stylesheet" type="text/css" href="./static/css/cs-skin-underline.css" />
+                        <link rel="stylesheet" type="text/css" href="./static/css/iconfont.css">
+                            <link rel="stylesheet" type="text/css" href="./static/css/cs-select.css" />
+                            <link rel="stylesheet" type="text/css" href="./static/css/cs-skin-underline.css" />
+                            <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.0/jquery.min.js"></script>
     </head>
     <body>
-        <body>
-            <div class="y-wrap">
-                <div class="y-box-wrap">
-                    <button class="y-btn-addip" id="addip">
-                        <span class="iconfont icon-plus"></span>
-                    </button>
-                    <div class="y-head-icon">
-                        <i class="iconfont icon-yunjisuan"></i>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-4 col-lg-offset-4  col-md-6 col-md-offset-3 col-sm-offset-2 col-sm-8 col-xs-12  y-wrap">
+                    <div class="row">
+                        <div class="y-head-icon">
+                            <span class="iconfont icon-yunjisuan"></span>
+                        </div>
                     </div>
-                    <section class="select-box">
-                        <select class="cs-select cs-skin-underline y-form-control optlist">
-                        </select>
-                    </section>
-                    <div class="y-btn-wrap">
-                        <button class="y-btn y-btn-primary" id="configip">
+                    <div class="row rowmarnone">
+                        <section class="col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10 select-box">
+                            <select class="cs-select cs-skin-underline optlist">
+                            </select>
+                        </section>
+                        
+                    </div>
+                    <div class='col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10 y-btn-wrap'>
+                        <button class="y-btn" id="configip">
                             确定
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="mask"></div>
-        </body>
-        <style type="text/css">
-            .y-test-box{
-                width: 100%;
-                /* background-color: #fff; */
-                margin-bottom: 10px;
-            }
-        .y-test-box span{
-            color: #fff;
-        }
-        .y-form-control-test{
-            display: inline-block;
-            border: none;
-            border-bottom: solid 1px #fff;
-            outline: none;
-            /* background-color: #9bbeda; */
-            padding: 10px 0;
-            font-size: 18px;
-            /* color: #fff; */
-            background-color: transparent;
-        }
-        .y-address{
-            width: 20%;
-        }
-        .y-ipcontent{
-            width: 15%;
-        }
+        </div>
+        </div>
+        <div class="mask"></div>
+        <div class="maskloading y-hide">
+            <div class='ant-spin ant-spin-spinning'>
+                <span class='ant-spin-dot ant-spin-dot-spin'><i></i><i></i><i></i><i></i></span>
+            </div>
+        </div>
+    </body>
+    <style>
         html{
             height: 100%;
-            width: 100%;
+            width:100%;
         }
-        body{
-            /* background-color: #9bbeda; */
-            background-image: url(./images/bg.jpeg);
-            background-size: 250% auto;
-            background-repeat: no-repeat;
-            -webkit-touch-callout:none;/*系统默认菜单被禁用*/
-            
-            -webkit-user-select:none;/*webkit浏览器*/
-            
-            -khtml-user-select:none;/*早起浏览器*/
-            
-            -moz-user-select:none;/*火狐浏览器*/
-            
-            -ms-user-select:none;/*IE浏览器*/
-            
-            user-select:none;/*用户是否能够选中文本*/
-        }
-        .mask{
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #534275;
-            opacity: 0.5;
-        }
-        .y-head-icon{
-            margin-top: 3rem;
-            text-align: center;
-            font-size: 24px;
-        }
-        .y-head-icon .iconfont{
-            color: #9bbeda;
-            font-size: 5rem;
-        }
-        .ipselect{
-            margin-top: 3rem;
-            background-color: transparent;
-            border: solid 0px;
-            -webkit-appearance: initial;
-            color: #fff;
-            border-bottom: 1px solid #fff;
-        }
-        .option-delete{
-            position: absolute;
-            display: inline-block;
-            boder: none;
-            border: none;
-            right: 0;
-            /* float: right; */
-            padding: 1.2em 0.8em;
-            top: -0.1em;
-        }
+    input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+        color:    #fff;
+    }
+    input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color:    #fff;
+    }
+    input::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color:    #fff;
+    }
+    input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color:    #fff;
+    }
+    
+    input:focus::-webkit-input-placeholder {
+        color: transparent;
+        /* transparent是全透明黑色(black)的速记法，即一个类似rgba(0,0,0,0)这样的值 */
+    }
+    input:focus:-moz-placeholder {
+        color: transparent;
+    }
+    input:focus::-moz-placeholder {
+        color: transparent;
+    }
+    input:focus:-ms-input-placeholder {
+        color: transparent;
+    }
+    body{
+        background-image: url(./images/bg.jpeg);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+    }
+    .iconfont{
+        color: #fff;
+    }
+    .mask{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #534275;
+        opacity: 0.5;
+    }
+    .y-wrap{
+        height: 400px;
+        margin-top: 40px;
+        z-index: 999;
+    }
+    .y-head-icon{
+        text-align: center;
+        margin: 40px 0;
+    }
+    .y-head-icon span{
+        font-size: 8rem;
+        color: #fff;
+    }
+    .select-box{
+        padding: 0;
+    }
+    .cs-options{
+        color: #fff;
         
-        input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-            color:    #fff;
-        }
-        input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-            color:    #fff;
-        }
-        input::-moz-placeholder { /* Mozilla Firefox 19+ */
-            color:    #fff;
-        }
-        input:-ms-input-placeholder { /* Internet Explorer 10-11 */
-            color:    #fff;
-        }
+    }
+    .y-test-box span,.y-test-box input,.y-test-box .col-xs-2,.double-input-box *{
+        color: #fff;
+        padding: 0;
+        margin: 0;
+    }
+    .cs-addicon{
+        background-color:#9bbeda;
+        text-align: center;
+        line-height: 20px;
+        border: solid 1px #fff;
+        border-radius: 20px;
+    }
+    .row{
+        margin: 0;
+    }
+    .y-form-control-test{
+        /* display: inline-block; */
+        border: none;
+        border-bottom: solid 1px #fff;
+        outline: none;
+        font-size: 18px;
+        background-color: transparent;
+    }
+    .y-form-control{
+        outline: none;
+        background-color: transparent;
+        border: solid 0px;
+        -webkit-appearance: initial;
+        color: #fff;
+        border-bottom: 1px solid #fff;
+    }
+    .y-input{
+        outline: none;
+        background-color: transparent;
+        border: solid 0px;
+        -webkit-appearance: initial;
+        color: #fff;
+    }
+    .y-btn-wrap{
+        /* margin: 0; */
+        padding: 0;
+        margin-top: 40px;
         
-        input:focus::-webkit-input-placeholder {
-            color: transparent;
-            /* transparent是全透明黑色(black)的速记法，即一个类似rgba(0,0,0,0)这样的值 */
-        }
-        input:focus:-moz-placeholder {
-            color: transparent;
-        }
-        input:focus::-moz-placeholder {
-            color: transparent;
-        }
-        input:focus:-ms-input-placeholder {
-            color: transparent;
-        }
+    }
+    .y-show{
+        display: block;
+    }
+    .y-hide{
+        display:none;
+    }
+    .option-delete{
+        position: absolute;
+        display: inline-block;
+        boder: none;
+        border: none;
+        right: 0;
+        /* float: right; */
+        padding: 1.2em 0.8em;
+        top: -0.1em;
+    }
+    .y-btn-wrap{
+        text-align: center;
+        margin-top: 2rem;
+    }
+    .y-btn{
+        display: inline-block;
+        width: 100%;
+        padding: 14px 12px;
+        margin:12px 0;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 30px;
+        background-color: #9bbeda;
+        outline: none;
+        color: #fff;
+        margin-top: 3rem;
+    }
+    .bugtip{
+        color: red;
         
+        font-size: 10px;
+        position: absolute;
+    }
+    .ripple {
+        position:absolute;
+        background:#9bbeda;
+        border-radius:100%;
+        transform:scale(0);
+        pointer-events:none;
+    }
+    .ripple.show {
+        animation:ripple .5s ease-out;
+    }
+    .double-input-box{
+        height: 2rem;
+    }
+    .maskloading{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:#9bbeda;
+        z-index: 10000;
+        text-align: center;
+    }
+    /* 动画相关的 */
+    .ant-spin-dot {
+        position: relative;
+        display: inline-block;
+        font-size: 20px;
+        width: 40px;
+        height: 40px;
+        margin-top: 25rem;
+    }
+    .ant-spin {
+        margin-right: 16px;
+    }
+    
+    .ant-spin {
+        font-family: Monospaced Number,Chinese Quote,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: rgba(0,0,0,.65);
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        color: #1890ff;
+        vertical-align: middle;
+        text-align: center;
+        opacity: 0;
+        position: absolute;
+        -webkit-transition: -webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
+        transition: -webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
+        transition: transform .3s cubic-bezier(.78,.14,.15,.86);
+        transition: transform .3s cubic-bezier(.78,.14,.15,.86),-webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
+        display: none;
+    }
+    .ant-spin-spinning {
+        opacity: 1;
+        position: static;
+        display: inline-block;
+    }
+    .ant-spin-dot-spin{
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+        -webkit-animation: antRotate 1.2s infinite linear;
+        animation: antRotate 1.2s infinite linear;
+    }
+    .ant-spin-dot i:first-child {
+        left: 0;
+        top: 0;
+    }
+    .ant-spin-dot i:nth-child(2) {
+        right: 0;
+        top: 0;
+        -webkit-animation-delay: .4s;
+        animation-delay: .4s;
+    }
+    .ant-spin-dot i:nth-child(3) {
+        right: 0;
+        bottom: 0;
+        -webkit-animation-delay: .8s;
+        animation-delay: .8s;
+    }
+    .ant-spin-dot i:nth-child(4) {
+        left: 0;
+        bottom: 0;
+        -webkit-animation-delay: 1.2s;
+        animation-delay: 1.2s;
+    }
+    .ant-spin-dot i {
+        width: 20px;
+        height: 20px;
+        border-radius: 100%;
+        background-color: #1890ff;
+        -webkit-transform: scale(.75);
+        -ms-transform: scale(.75);
+        transform: scale(.75);
+        display: block;
+        position: absolute;
+        opacity: .3;
+        -webkit-animation: antSpinMove 1s infinite linear alternate;
+        animation: antSpinMove 1s infinite linear alternate;
+        -webkit-transform-origin: 50% 50%;
+        -ms-transform-origin: 50% 50%;
+        transform-origin: 50% 50%;
+    }
+    @-webkit-keyframes antSpinMove {
+        to {
+            opacity: 1
+        }
+    }
+    
+    @keyframes antSpinMove {
+        to {
+            opacity: 1
+        }
+    }
+    @-webkit-keyframes antRotate {
+        to {
+            -webkit-transform: rotate(405deg);
+            transform: rotate(405deg)
+        }
+    }
+    
+    @keyframes antRotate {
+        to {
+            -webkit-transform: rotate(405deg);
+            transform: rotate(405deg)
+        }
+    }
+    @keyframes ripple {
+        to {
+            transform:scale(2);
+            /* opacity:0; */
+        }
+    }
+    @media (min-width:  768px) {
         .y-wrap{
-            /* padding-top: 10%; */
-            width: 100%;
-            height: 100%;
-            position: relative;
-            z-index: 99;
-        }
-        .y-header-title{
-            text-align: center;
-        }
-        .y-box-wrap{
-            margin: 20px 10px;
-        }
-        .y-lable-input{
-            /* display: none; */
-            color: #fff;
-        }
-        .y-form-control{
-            width: 100%;
-            display: block;
-            /* border: none; */
-            /* border-bottom: solid 1px #fff; */
-            outline: none;
-            /* background-color: #9bbeda; */
-            /* padding: 10px 0; */
-            font-size: 18px;
-            /* color: #fff; */
-        }
-        .cs-placeholder,.cs-addicon{
-            position: absolute;
-            bottom: 20px;
-            right: 10px;
-            color: #fff;
-            width: 20px;
-            height: 20px;
-            /* text-align: center; */
-            font-weight: bold;
-        }
-        .cs-addicon{
-            background-color:#9bbeda;
-            text-align: center;
-            line-height: 20px;
-            border: solid 1px #fff;
-            border-radius: 20px;
-        }
-        .cs-options {
-            color: #fff;
-        }
-        .y-btn-wrap{
-            text-align: center;
-            margin-top: 2rem;
-        }
-        .y-btn{
-            display: inline-block;
-            width: 100%;
-            padding: 14px 12px;
-            margin:12px 0;
-            margin-bottom: 0;
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 1.42857143;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: middle;
-            -ms-touch-action: manipulation;
-            touch-action: manipulation;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            background-image: none;
-            border: 1px solid transparent;
-            border-radius: 30px;
-            background-color: #9bbeda;
-            outline: none;
-            color: #fff;
-        }
-        .y-btn-addip{
-            width: 50px;
-            height: 50px;
-            line-height: 50px;
-            background-color: #9bbeda;
-            color: #fff;
-            text-align: center;
-            /* font-size: 50px; */
-            border-radius: 25px;
-            border: solid 1px #fff;
-        }
-        .y-show{
-            display: block;
-        }
-        .y-hide{
-            display:none;
-        }
-        .y-btn-animation{
-            width: 50px;
-            height: 50px;
+            background-color: #f5f5f5;
+            border: 1px solid #e3e3e3;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+            border-radius: 3px;
+            -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: rgba(255,255,255, 0.2);
         }
         
-        /* 动画相关的 */
-        .ant-spin-dot {
-            position: relative;
-            display: inline-block;
-            font-size: 20px;
-            width: 20px;
-            height: 20px;
-        }
-        .ant-spin {
-            margin-right: 16px;
-        }
-        
-        .ant-spin {
-            font-family: Monospaced Number,Chinese Quote,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            color: rgba(0,0,0,.65);
-            -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            color: #1890ff;
-            vertical-align: middle;
-            text-align: center;
-            opacity: 0;
-            position: absolute;
-            -webkit-transition: -webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
-            transition: -webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
-            transition: transform .3s cubic-bezier(.78,.14,.15,.86);
-            transition: transform .3s cubic-bezier(.78,.14,.15,.86),-webkit-transform .3s cubic-bezier(.78,.14,.15,.86);
-            display: none;
-        }
-        .ant-spin-spinning {
-            opacity: 1;
-            position: static;
-            display: inline-block;
-        }
-        .ant-spin-dot-spin{
-            -webkit-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            transform: rotate(45deg);
-            -webkit-animation: antRotate 1.2s infinite linear;
-            animation: antRotate 1.2s infinite linear;
-        }
-        .ant-spin-dot i:first-child {
-            left: 0;
-            top: 0;
-        }
-        .ant-spin-dot i:nth-child(2) {
-            right: 0;
-            top: 0;
-            -webkit-animation-delay: .4s;
-            animation-delay: .4s;
-        }
-        .ant-spin-dot i:nth-child(3) {
-            right: 0;
-            bottom: 0;
-            -webkit-animation-delay: .8s;
-            animation-delay: .8s;
-        }
-        .ant-spin-dot i:nth-child(4) {
-            left: 0;
-            bottom: 0;
-            -webkit-animation-delay: 1.2s;
-            animation-delay: 1.2s;
-        }
-        .ant-spin-dot i {
-            width: 9px;
-            height: 9px;
-            border-radius: 100%;
-            background-color: #1890ff;
-            -webkit-transform: scale(.75);
-            -ms-transform: scale(.75);
-            transform: scale(.75);
-            display: block;
-            position: absolute;
-            opacity: .3;
-            -webkit-animation: antSpinMove 1s infinite linear alternate;
-            animation: antSpinMove 1s infinite linear alternate;
-            -webkit-transform-origin: 50% 50%;
-            -ms-transform-origin: 50% 50%;
-            transform-origin: 50% 50%;
-        }
-        .ripple {
-            position:absolute;
-            background:#9bbeda;
-            border-radius:100%;
-            transform:scale(0);
-            pointer-events:none;
-        }
-        .ripple.show {
-            animation:ripple .5s ease-out;
-        }
-        @keyframes ripple {
-            to {
-                transform:scale(2);
-                /* opacity:0; */
-            }
-        }
-        @-webkit-keyframes antSpinMove {
-            to {
-                opacity: 1
-            }
-        }
-        
-        @keyframes antSpinMove {
-            to {
-                opacity: 1
-            }
-        }
-        @-webkit-keyframes antRotate {
-            to {
-                -webkit-transform: rotate(405deg);
-                transform: rotate(405deg)
-            }
-        }
-        
-        @keyframes antRotate {
-            to {
-                -webkit-transform: rotate(405deg);
-                transform: rotate(405deg)
-            }
-        }
-        
-        /* 小屏幕（平板，大于等于 768px） */
-        @media (min-width:  400px) {
-            body{
-                /* background-color: #9bbeda; */
-                background-image: url(./images/bg.jpeg);
-                /* background-size: 250% auto; */
-                background-size: cover;
-                background-repeat: no-repeat;
-                overflow-x: hidden;
-                border: none;
-            }
-            .y-wrap{
-                /* padding-top: 10%; */
-                width: 100%;
-                height: 100%;
-                position: relative;
-                z-index: 99;
-                padding: 0 50%;
-                padding-top: 20px;
-            }
-            .y-box-wrap{
-                min-height: 20px;
-                padding: 19px;
-                margin-bottom: 20px;
-                background-color: #f5f5f5;
-                border: 1px solid #e3e3e3;
-                border-radius: 4px;
-                -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
-                box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
-                border-radius: 3px;
-                -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                background: rgba(255,255,255, 0.2);
-                width: 400px;
-                margin-left: -220px;
-            }
-            div.cs-skin-underline {
-                font-size: 1.2em;
-            }
-        }
-        /* 中等屏幕（桌面显示器，大于等于 992px） */
-        @media (max-height: 400px) {
-            body {
-                /* background-color: #9bbeda; */
-                background-image: url(./images/bg.jpeg);
-                background-size: auto 200%;
-                /* background-size: cover; */
-                background-repeat: no-repeat;
-                /* overflow: hidden; */
-                border: none;
-                padding: 0;
-            }
-        }
-        
-        /* 大屏幕（大桌面显示器，大于等于 1200px） */
-        @media (min-width:  1200px) {
-            
-        }
-        </style>
-        <script src="./static/js/classie.js"></script>
-        <script src="./static/js/selectFx.js"></script>
-        <script>
-            $(function(){
-              //检测上次的记录跳转
-              if(localStorage.getItem('lastip')){
-              var ipstr = localStorage.getItem('lastip');
-              var ipurl = 'http://'+ipstr+'/cu';
-              operationDatatest(ipurl,'get')
-              .then(function(data,status,xhr){
-                    if(xhr.status == 200){
-                    //跳转前向端发消息
-                    getCUAdress('http://'+ipstr+'/');
-                    window.location.href=ipurl;
-                    }else{
-                    return;
-                    }
-                    
-                    },function(err){
-                    location.reload();
-                    })
-              }
-              
-              //检测屏幕的高度
-              $('.mask').height($(document).height());
-              //先根据缓存渲染select
-              renderselect();
-              $(".option-delete").click(function(){
-                                        //删除localstorage中相应的东西
-                                        var iplist = JSON.parse(localStorage.getItem('iplist'));
-                                        var ipindex = iplist.indexOf($(this).parents("span").text());
-                                        iplist.splice(ipindex,1)
-                                        localStorage.setItem('iplist', JSON.stringify(iplist));
-                                        $(this).parents("li").remove();
-                                        })
-              $("#addip").click(function(){
-                                //将ip加入localstorage中
-                                var ipstr = $('.y-placeholder').val();
-                                if(ipstr !== ''){
-                                if (localStorage.getItem('iplist')) {
-                                var iplist = JSON.parse(localStorage.getItem('iplist'));
-                                //如果已经存在则不添加
-                                if(iplist.indexOf(ipstr) == -1){
-                                console.log("ip不存在")
-                                iplist.push(ipstr);
-                                localStorage.setItem('iplist', JSON.stringify(iplist));
-                                }else{
-                                console.log("ip已存在")
-                                }
-                                }else{
-                                var testarr = [];
-                                localStorage.setItem('iplist', JSON.stringify(testarr));
-                                var iplist = JSON.parse(localStorage.getItem('iplist'));
-                                iplist.push(ipstr);
-                                localStorage.setItem('iplist', JSON.stringify(iplist));
-                                }
-                                }
-                                renderselect();
-                                })
-              
-              })
-              
-              $("#configip").click(function(e){
-                                   var event = e;
-                                   //将按钮设置成loading状态
-                                   // $(this).addClass("y-btn-animation");
-                                   // $(this).html("<div class='ant-spin ant-spin-spinning'><span class='ant-spin-dot ant-spin-dot-spin'><i></i><i></i><i></i><i></i></span></div>");
-                                   addRippleEffect(event);
-                                   
-                                   
-                                   })
-                                   
-                                   var addRippleEffect = function (e) {
-                                       var target = e.target;
-                                       var elewrap = document.querySelector('.y-wrap')
-                                       var rect = elewrap.getBoundingClientRect();
-                                       var ripple = target.querySelector('.ripple');
-                                       if (!ripple) {
-                                           ripple = document.createElement('span');
-                                           ripple.className = 'ripple'
-                                           ripple.style.height = ripple.style.width = Math.max(rect.width, rect.height) + 'px'
-                                           target.appendChild(ripple);
-                                       }
-                                       ripple.classList.remove('show');
-                                       var top = e.pageY - rect.top - ripple.offsetHeight / 2 - document.body.scrollTop;
-                                       var left = e.pageX - rect.left - ripple.offsetWidth / 2 - document.body.scrollLeft;
-                                       ripple.style.top = top + 'px'
-                                       ripple.style.left = left + 'px'
-                                       ripple.classList.add('show');
-                                       
-                                       var ipstr = $('.y-placeholder').val();
-                                       var reg = /[^:]*:([^:]*)/;
-                                       ipstr=ipstr.replace(reg,"$1");
-                                       var ipurl = 'http://'+ipstr+'/cu'
-                                       operationDatatest(ipurl,'get')
-                                       .then(function(data,status,xhr){
-                                             console.log(xhr.status)
-                                             if(xhr.status == 200){
-                                             //跳转前向端发消息
-                                    
-                                             getCUAdress('http://'+ipstr+'/');
-                                             if(localStorage.getItem('lastip')){
-                                             localStorage.setItem('lastip',ipstr);
-                                             }else{
-                                             localStorage.setItem('lastip',ipstr);
-                                             }
-                                             window.location.href=ipurl;
-                                             
-                                             }else{
-                                             location.reload();
-                                             }
-                                             
-                                             },function(err){
-                                             location.reload();
-                                             })
-                                             return false;
-                                   }
-        function getCUAdress(ipstr){
-            window.app.getCUAdress(JSON.stringify(
-                                                  {
-                                                  url:ipstr,
-                                                  yosangcookie:document.cookie
-                                                  }
-                                                  )
-                                   )
-        }
-        function operationData(myurl,method,data){
-            return $.ajax({
-                          type:method,            
-                          url:myurl,                                           
-                          data:data,
-                          })
-        }
-        function operationDatatest(myurl,method){
-            return $.ajax({
-                          type:method,            
-                          url:myurl
-                          })
-        }
-        function renderselect(){
-            $('.select-box').html("<select class='cs-select cs-skin-underline y-form-control optlist'></select>");
-            if (localStorage.getItem('iplist')) {
-                var opthtml='',iplist = JSON.parse(localStorage.getItem('iplist'));
-                iplist.forEach(function(value, index){
-                               if(index == 0){
-                               opthtml = opthtml + "<option selected>"+value+"</option>";
-                               }else{
-                               opthtml = opthtml + "<option value='"+index+"'>"+value+"</option>";
-                               }  
+    }
+    </style>
+    <script>
+        $('.maskloading').removeClass('y-hide');
+        </script>
+    <script src="./static/js/classie.js"></script>
+    <script src="./static/js/selectFx.js"></script>
+    <script>
+        $(function(){
+          $('.maskloading').removeClass('y-hide');
+          if(localStorage.getItem('lastip')){
+          console.log('lala')
+          var ipstr = localStorage.getItem('lastip');
+          var ipurl = 'http://'+ipstr+'/cu';
+          $.ajax({
+                 type:'get',
+                 url:ipurl,
+                 data:{},
+                 timeout : 3000,
+                 success:function(data,status,xhr){ //请求成功的回调函数
+                 　　　if(xhr.status == 200){
+                 getCUAdress('http://'+ipstr+'/');
+                 if(localStorage.getItem('lastip')){
+                 localStorage.setItem('lastip',ipstr);
+                 }else{
+                 localStorage.setItem('lastip',ipstr);
+                 }
+                 window.location.href=ipurl;
+                 }
+                 　　},
+                 　　complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+                 　　　　if(status=='timeout'){//超时,status还有success,error等值的情况
+                 console.log('ip地址无法访问1')
+                 var tiphtml = "<div class='bugtip'>ip地址无法访问</div>"
+                 $('.select-box').append(tiphtml);
+                 setTimeout(function(){
+                            $('.bugtip').remove();
+                            },800)
+                 return;
+                 　　    }
+                 }
+                 })
+          }else{
+          console.log('lalaya')
+          $('.maskloading').addClass('y-hide');
+          }
+          //检测屏幕的高度
+          $('.mask').height($(document).height());
+          //先根据缓存渲染select
+          renderselect();
+          $(document).on( 'click touchstart', function(ev) {
+                         //alert('dianjile')
+                         
+                         var target = ev.target;
+                         if(isfocus() && target !== document.querySelector('.cs-select') && !hasParent( target, document.querySelector('.cs-select') ) ){
+                         $('div.y-test-box').addClass('y-hide');
+                         $('div.y-test-box').removeClass('y-show');
+                         $('.cs-addicon ').addClass('y-hide');
+                         $('.cs-addicon ').removeClass('y-show');
+                         $('.y-placeholder').addClass('y-show');
+                         $('.y-placeholder').removeClass('y-hide');
+                         $('.cs-options').addClass('y-show');
+                         $('.cs-options').removeClass('y-hide');
+                         if($('.cs-placeholder')){
+                         $('.cs-placeholder').addClass('y-show');
+                         $('.cs-placeholder').removeClass('y-hide')
+                         }
+                         $('.double-input-box').removeClass('y-focus');
+                         }
+                         } );
+          
+          })
+          
+          $("#configip").click(function(e){
+                               var event = e;
+                               //将按钮设置成loading状态
+                               addRippleEffect(event);
+                               
+                               
                                })
-                               $(".optlist").html(opthtml);
-            }
-            [].slice.call( document.querySelectorAll( 'select.cs-select' ) ).forEach( function(el) {	
-                                                                                     console.log(el)
-                                                                                     new SelectFx(el);
-                                                                                     } );
-                                                                                     $('.cs-placeholder').click(function(){
-                                                                                                                $(this).toggleClass("main");
-                                                                                                                })
+                               
+                               var addRippleEffect = function (e) {
+                                   // var target = e.target;
+                                   // var elewrap = document.querySelector('.y-wrap')
+                                   // var rect = elewrap.getBoundingClientRect();
+                                   // var ripple = target.querySelector('.ripple');
+                                   // if (!ripple) {
+                                   //     ripple = document.createElement('span');
+                                   //     ripple.className = 'ripple'
+                                   //     ripple.style.height = ripple.style.width = Math.max(rect.width, rect.height) + 'px'
+                                   //     target.appendChild(ripple);
+                                   // }
+                                   // ripple.classList.remove('show');
+                                   // var top = e.pageY - rect.top - ripple.offsetHeight / 2 - document.body.scrollTop;
+                                   // var left = e.pageX - rect.left - ripple.offsetWidth / 2 - document.body.scrollLeft;
+                                   // ripple.style.top = top + 'px'
+                                   // ripple.style.left = left + 'px'
+                                   // ripple.classList.add('show');
+                                   // setTimeout(function(){
+                                   var ipstr = $('.y-placeholder').val();
+                                   var reg = /[^:]*:([^:]*)/;
+                                   ipstr=ipstr.replace(reg,"$1");
+                                   var ipurl = 'http://'+ipstr+'/cu';
+                                   $.ajax({
+                                          type:'get',
+                                          url:ipurl,
+                                          data:{},
+                                          timeout : 3000,
+                                          success:function(data,status,xhr){ //请求成功的回调函数
+                                          　　　if(xhr.status == 200){
+                                          getCUAdress('http://'+ipstr+'/');
+                                          if(localStorage.getItem('lastip')){
+                                          localStorage.setItem('lastip',ipstr);
+                                          }else{
+                                          localStorage.setItem('lastip',ipstr);
+                                          }
+                                          window.location.href=ipurl;
+                                          }
+                                          　　},
+                                          　　complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+                                          　　　　if(status=='timeout'){//超时,status还有success,error等值的情况
+                                          console.log('ip地址无法访问1')
+                                          var tiphtml = "<div class='bugtip'>ip地址无法访问</div>"
+                                          $('.select-box').append(tiphtml);
+                                          setTimeout(function(){
+                                                     $('.bugtip').remove();
+                                                     },800)
+                                          return;
+                                          　　    }
+                                          }
+                                          })
+                                          // },1000)
+                                          
+                                          // operationDatatest(ipurl,'get')
+                                          // .then(function(data,status,xhr){
+                                          //     console.log(xhr.status)
+                                          //     if(xhr.status == 200){
+                                          //        // getCUAdress('http://'+ipstr+'/');
+                                          //         if(localStorage.getItem('lastip')){
+                                          //             localStorage.setItem('lastip',ipstr);
+                                          //         }else{
+                                          //             localStorage.setItem('lastip',ipstr);
+                                          //         }
+                                          //         window.location.href=ipurl;
+                                          //     }else{
+                                          //         console.log('ip地址无法访问1')
+                                          //          var tiphtml = "<div class='bugtip'>ip地址无法访问</div>"
+                                          //             $('.select-box').append(tiphtml);
+                                          //             setTimeout(function(){
+                                          //                 $('.bugtip').remove();
+                                          //             },800)
+                                          //        return;
+                                          //         //window.location.href='http://172.20.156.168/ctlogin/ipconfig.html';
+                                          //     }
+                                          
+                                          // },function(err){
+                                          //     console.log('ip地址无法访问2')
+                                          
+                                          //     var tiphtml = "<div class='bugtip'>ip地址无法访问</div>"
+                                          //             $('.select-box').append(tiphtml);
+                                          //             setTimeout(function(){
+                                          //                 $('.bugtip').remove();
+                                          //             },800)
+                                          //     return;
+                                          //     // console.log(err)
+                                          //     // window.location.href='http://172.20.156.168/ctlogin/ipconfig.html';
+                                          // })
+                                          // setTimeout(function(){
+                                          //         window.location.href="http://172.20.156.168/cu";
+                                          //     },200)
+                                          return false;
+                               }
+    function operationData(myurl,method,data){
+        return $.ajax({
+                      type:method,
+                      url:myurl,
+                      data:data,
+                      timeout : 1000,
+                      })
+    }
+    function operationDatatest(myurl,method){
+        return $.ajax({
+                      type:method,
+                      url:myurl,
+                      // jsonp: "callback",
+                      // jsonpCallback:"success",
+                      // dataType : 'jsonp',
+                      })
+    }
+    function renderselect(){
+        $('.select-box').html("<select class='cs-select cs-skin-underline optlist'></select>");
+        if (localStorage.getItem('iplist')) {
+            var opthtml='',iplist = JSON.parse(localStorage.getItem('iplist'));
+            iplist.forEach(function(value, index){
+                           if(index == 0){
+                           opthtml = opthtml + "<option selected>"+value+"</option>";
+                           }else{
+                           opthtml = opthtml + "<option value='"+index+"'>"+value+"</option>";
+                           }
+                           })
+                           $(".optlist").html(opthtml);
         }
+        [].slice.call( document.querySelectorAll( 'select.cs-select' ) ).forEach( function(el) {
+                                                                                 console.log(el)
+                                                                                 new SelectFx(el);
+                                                                                 } );
+                                                                                 $('.cs-placeholder').click(function(){
+                                                                                                            $(this).toggleClass("main");
+                                                                                                            })
+                                                                                                            $(".option-delete").click(function(){
+                                                                                                                                      //删除localstorage中相应的东西
+                                                                                                                                      var iplist = JSON.parse(localStorage.getItem('iplist'));
+                                                                                                                                      var ipindex = iplist.indexOf($(this).parents("span").text());
+                                                                                                                                      iplist.splice(ipindex,1)
+                                                                                                                                      localStorage.setItem('iplist', JSON.stringify(iplist));
+                                                                                                                                      $(this).parents("li").remove();
+                                                                                                                                      })
+                                                                                                                                      $('.y-placeholder').click(function(ev){
+                                                                                                                                                                //console.log('dianjile')
+                                                                                                                                                                ev.preventDefault();
+                                                                                                                                                                if($('div.y-test-box').length == 0){
+                                                                                                                                                                var testSelEl = document.createElement( 'div' );
+                                                                                                                                                                var ipinputHtml = "<div class='y-test-box'><input class='y-form-control-test y-address'></input><span>:</span><input class='y-form-control-test y-ipcontent y-ipcontent-one'></input><span>.</span><input class='y-form-control-test y-ipcontent y-ipcontent-two'></input><span>.</span><input class='y-form-control-test y-ipcontent y-ipcontent-three'></input><span>.</span><input class='y-form-control-test y-ipcontent y-ipcontent-four'></input><span>:</span><input class='y-form-control-test y-port'></input></div>";
+                                                                                                                                                                var ipaddhtml = "<span class='cs-addicon iconfont icon-plus' id='addip'></span>";
+                                                                                                                                                                var html = "<div class='y-test-box col-xs-11'><div class='col-xs-2'><div class='row'><input class='y-address col-xs-10 y-form-control-test'></input><span class=''>:</span></div></div><div class='col-xs-2'><div class='row'><input class='y-ipcontent col-xs-10 y-form-control-test'></input><span class=''>.</span></div></div><div class='col-xs-2'><div class='row'><input class='y-ipcontent col-xs-10 y-form-control-test'></input><span class=''>.</span></div></div><div class='col-xs-2'><div class='row'><input class='y-ipcontent col-xs-10 y-form-control-test'></input><span class=''>.</span></div></div><div class='col-xs-2'><div class='row'><input class='y-ipcontent col-xs-10 y-form-control-test'></input><span class=''>:</span></div></div><div class='col-xs-2'><div class='row'><input class='y-port col-xs-10 y-form-control-test'></input></div></div> </div><span class='cs-addicon iconfont icon-plus col-xs-1' id='addip'></span>";
+                                                                                                                                                                $('.double-input-box').append(html);
+                                                                                                                                                                $('.y-placeholder').addClass('y-hide');
+                                                                                                                                                                $('.y-placeholder').removeClass('y-show');
+                                                                                                                                                                $('.cs-options').addClass('y-hide');
+                                                                                                                                                                $('.cs-options').removeClass('y-show');
+                                                                                                                                                                if($('.cs-placeholder')){
+                                                                                                                                                                $('.cs-placeholder').addClass('y-hide');
+                                                                                                                                                                $('.cs-placeholder').removeClass('y-show')
+                                                                                                                                                                }
+                                                                                                                                                                $('select.cs-select') .addClass('cs-focus')
+                                                                                                                                                                }else{
+                                                                                                                                                                $('div.y-test-box').addClass('y-show');
+                                                                                                                                                                $('div.y-test-box').removeClass('y-hide');
+                                                                                                                                                                $('.cs-addicon ').addClass('y-show');
+                                                                                                                                                                $('.cs-addicon ').removeClass('y-hide');
+                                                                                                                                                                $('.y-placeholder').addClass('y-hide');
+                                                                                                                                                                $('.y-placeholder').removeClass('y-show');
+                                                                                                                                                                $('.cs-options').addClass('y-hide');
+                                                                                                                                                                $('.cs-options').removeClass('y-show');
+                                                                                                                                                                if($('.cs-placeholder')){
+                                                                                                                                                                $('.cs-placeholder').addClass('y-hide');
+                                                                                                                                                                $('.cs-placeholder').removeClass('y-show')
+                                                                                                                                                                }
+                                                                                                                                                                }
+                                                                                                                                                                $('.double-input-box').addClass('y-focus');
+                                                                                                                                                                
+                                                                                                                                                                $("#addip").click(function(){
+                                                                                                                                                                                  //将ip加入localstorage中
+                                                                                                                                                                                  //先判断ip地址是否合fa
+                                                                                                                                                                                  var ipstr = $('.y-address').val() + ':';
+                                                                                                                                                                                  var flag = true;
+                                                                                                                                                                                  $('.y-ipcontent').each(function(index){
+                                                                                                                                                                                                         if(!isValidIP($(this).val()) || !$(this).val()){
+                                                                                                                                                                                                         console.log('ip地址格式错误')
+                                                                                                                                                                                                         //显示提示框ip错
+                                                                                                                                                                                                         flag =false;
+                                                                                                                                                                                                         }
+                                                                                                                                                                                                         if(index == 0){
+                                                                                                                                                                                                         ipstr = ipstr + $(this).val()
+                                                                                                                                                                                                         }else{
+                                                                                                                                                                                                         ipstr = ipstr +'.'+ $(this).val()
+                                                                                                                                                                                                         }
+                                                                                                                                                                                                         })
+                                                                                                                                                                                  if(flag){
+                                                                                                                                                                                  console.log('是否在执行')
+                                                                                                                                                                                  if($('.y-port').val()){
+                                                                                                                                                                                  ipstr =ipstr + ':' + $('.y-port').val();
+                                                                                                                                                                                  }
+                                                                                                                                                                                  if(ipstr !== ''){
+                                                                                                                                                                                  if (localStorage.getItem('iplist')) {
+                                                                                                                                                                                  var iplist = JSON.parse(localStorage.getItem('iplist'));
+                                                                                                                                                                                  //如果已经存在则不添加
+                                                                                                                                                                                  if(iplist.indexOf(ipstr) == -1){
+                                                                                                                                                                                  console.log("ip不存在")
+                                                                                                                                                                                  iplist.push(ipstr);
+                                                                                                                                                                                  localStorage.setItem('iplist', JSON.stringify(iplist));
+                                                                                                                                                                                  }else{
+                                                                                                                                                                                  console.log("ip已存在")
+                                                                                                                                                                                  }   
+                                                                                                                                                                                  }else{
+                                                                                                                                                                                  var testarr = [];
+                                                                                                                                                                                  localStorage.setItem('iplist', JSON.stringify(testarr));
+                                                                                                                                                                                  var iplist = JSON.parse(localStorage.getItem('iplist'));
+                                                                                                                                                                                  iplist.push(ipstr);
+                                                                                                                                                                                  localStorage.setItem('iplist', JSON.stringify(iplist));
+                                                                                                                                                                                  }
+                                                                                                                                                                                  }
+                                                                                                                                                                                  renderselect();
+                                                                                                                                                                                  }else{
+                                                                                                                                                                                  var tiphtml = "<div class='bugtip'>ip地址格式错误</div>"
+                                                                                                                                                                                  $('.select-box').append(tiphtml);
+                                                                                                                                                                                  setTimeout(function(){
+                                                                                                                                                                                             $('.bugtip').remove();
+                                                                                                                                                                                             },800)
+                                                                                                                                                                                  }
+                                                                                                                                                                                  
+                                                                                                                                                                                  })
+                                                                                                                                                                })
+    }
+    function isfocus(){
+        if($('.double-input-box').hasClass('y-focus')){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    function hasParent( e, p ) {
+        if (!e) return false;
+        var el = e.target||e.srcElement||e||false;
+        while (el && el != p) {
+            el = el.parentNode||false;
+        }
+        return (el!==false);
+    };
+    function isValidIP(ip) {
+        var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+        return reg.test(ip);
+    } 
+    function getCUAdress(ipurl){
+        window.app.getCUAdress(JSON.stringify({url:ipurl}))
+    };
+    
         </script>
 </html>

@@ -61,7 +61,7 @@ float _h; //有效活动高度
     }
     return self;
 }
-- (void)tapAction{
+- (void) tapAction{
     [self.delegate floatTapAction:nil];
 }
 #pragma mark - UIResponder
@@ -159,11 +159,5 @@ float _h; //有效活动高度
          complete();
      }];
 }
-
-
-
-
-
-
 
 @end

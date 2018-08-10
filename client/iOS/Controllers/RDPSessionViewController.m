@@ -410,11 +410,6 @@
 }
 
 
-
-
-
-
-
 - (void)sessionDidConnect:(RDPSession*)session
 {
     //登录成功，设置flag
@@ -440,7 +435,7 @@
     //登陆成功关掉计时器
     if(is_timeup) //计时器没到时才关闭
         [timer invalidate]; //关闭计时器。。。
-    [[self view] makeToast:NSLocalizedString(@"接入云端成功。。。", @"success to connect  message") duration:ToastDurationNormal position:@"center"];
+    [[self view] makeToast:NSLocalizedString(@"接入云端成功", @"success to connect message") duration:ToastDurationNormal position:@"center"];
     
     //new add 2缩放
     /*CGAffineTransform mytransform=CGAffineTransformScale(_session_scrollview.transform, 0.8, 0.7);
@@ -487,7 +482,6 @@
     [_connected_view autorelease];
     
     //加载悬浮按钮
-    
     _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176, 46, 46)];
     [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176);
     _myfloatbutton.alpha=0.5;
@@ -499,7 +493,6 @@
     _mymenuview=[[MenuView alloc] init];
 
     _mymenuview.clickMenuButton = ^(NSInteger tag){
-        
         ISShowMenuButton = YES;
         [self floatTapAction:nil];
         [self menuButtonTapAction:tag];

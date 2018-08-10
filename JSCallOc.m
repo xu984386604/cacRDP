@@ -18,12 +18,13 @@
  *****************************/
 -(void)AcceptTheDataFromJs:(NSString *)data
 {
-   NSData *str=[data dataUsingEncoding:NSUTF8StringEncoding];
+    NSLog(@"准备打开应用！");
+    NSData *str=[data dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err=nil;
     _dic = [NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
     NSAssert( _dic!= nil, @"接收到的json数据不能为空！");
     
-    NSLog(@"%@",_dic);
+    NSLog(@"收到的服务端发来的打开远程应用的连接信息：%@",_dic);
    
     //解析json数据保存到vminfo中
     vminfo * myinfo = [vminfo share];

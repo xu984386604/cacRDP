@@ -59,7 +59,7 @@
 }
 
 - (void)cacSBStartBackgroundTask{
-    timer = [NSTimer scheduledTimerWithTimeInterval:300.0f target:self selector:@selector(sendMessage) userInfo:nil repeats:YES];
+    timer = [NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(sendMessage) userInfo:nil repeats:YES];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application

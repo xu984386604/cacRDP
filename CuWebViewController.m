@@ -8,27 +8,23 @@
 
 #import "CuWebViewController.h"
 #import "Bookmark.h"
+#import "Toast+UIView.h"
 
 
-@interface CuWebViewController ()
+@interface CuWebViewController () <MyFloatButtonDelegate>
+{
+    MyFloatButton * _myfloatbutton;  //悬浮按钮
+}
 @property(nonatomic,strong)NSTimer * mytimer; //计时器
-
 @end
 
 @implementation CuWebViewController
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //初始化 http://172.20.156.109/
-    //[vminfo share].cuIp=@"http://172.20.100.11/";
-    //innerCuUrl=@"http://172.20.100.11/";
     innerNet=@"1"; //默认外网
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
-    
     [self loadLocalHTML:@"ipconfig" inDirectory:@"ipconfig"];
-    //判断内外网
-    //[self is_External_network];
     
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
@@ -193,7 +189,7 @@
         [self sendMessage: @"recoverMsg"];
         //每个300s发送一次
         if (![vminfo share].recoverTimer) {
-            [vminfo share].recoverTimer = [NSTimer scheduledTimerWithTimeInterval:300.0 target:self selector:@selector(sendTimerMessage:) userInfo:@{@"smsType":@"recoverMsg"} repeats:YES];
+            [vminfo share].recoverTimer = [NSTimer scheduledTimerWithTimeInterval:60.0 target:self selector:@selector(sendTimerMessage:) userInfo:@{@"smsType":@"recoverMsg"} repeats:YES];
         }
     }
 }
@@ -424,8 +420,13 @@
     //7. alipays://platformapi/startApp?appId=10000007&sourceId=excashierQrcodePay&actionType=route&qrcode=https%3A%2F%2Fqr.alipay.com%2Fupx00279er7br22tzsny6051
     //8. about:blank
     
+    if ([vminfo share].cuIp && [urlStr containsString:[vminfo share].cuIp]) {
+        [self removeAlipayFloatButton];
+    }
+    
     //判断是否是阿里支付的url
     if ([urlStr hasPrefix:@"alipays://"] || [urlStr hasPrefix:@"alipay://"]) {
+        [self loadAlipayFloatButton];
         //支付宝是否已经安装
         BOOL isExist = [[UIApplication sharedApplication] canOpenURL:reqUrl];
         if (!isExist) {
@@ -491,5 +492,48 @@
         [storage deleteCookie:cookie];
     }
 }
-   
+
+//悬浮按钮的点击事件
+- (void)floatTapAction:(MyFloatButton *)sender
+{
+    [[self view] makeToast:NSLocalizedString(@"马上返回cu界面", @"come back to cu interface") duration:ToastDurationNormal position:@"center"];
+    NSString *cuurl=[NSString stringWithFormat:@"%@/cu",[vminfo share].cuIp];
+    NSURLRequest *myrequest=[NSURLRequest requestWithURL:[NSURL URLWithString:cuurl]];
+    [self performSelector:@selector(loadCuPage:) withObject:myrequest afterDelay:3.0f];
+    
+    _isNotFirstLoad = YES;
+}
+
+-(void) loadCuPage:(NSURLRequest*) myrequest {
+    [UIView animateWithDuration:1.0f animations:^{
+        [myWebView removeFromSuperview];
+        myWebView = [[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        [self.view addSubview:myWebView];
+        myWebView.delegate = self;
+        [myWebView loadRequest:myrequest];
+    }];
+}
+
+//加载支付宝支付的浮动按钮
+- (void) loadAlipayFloatButton {
+    if(!_myfloatbutton) {
+        _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176, 46, 46)];
+        [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176);
+        _myfloatbutton.alpha=0.5;
+        _myfloatbutton.delegate=self;
+        _myfloatbutton.bannerIV.image= [CommonUtils text:@"返回" addToView:[UIImage imageNamed:@"menu.png"] textColor:[UIColor redColor]];
+        
+        [self.view addSubview:_myfloatbutton];
+    }
+}
+
+//移除支付宝支付的浮动按钮
+- (void) removeAlipayFloatButton {
+    if(_myfloatbutton) {
+        _myfloatbutton.hidden = YES;
+        [self.view willRemoveSubview:_myfloatbutton];
+        _myfloatbutton = nil;
+    }
+}
+
 @end

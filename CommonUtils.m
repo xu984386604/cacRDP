@@ -111,4 +111,74 @@ bool IsInner(unsigned int userIp, unsigned int begin, unsigned int end)
     return (userIp >= begin) && (userIp <= end);
 }
 
+
+#pragma mark - 将文字添加到图片的方法实现
+
++ (UIImage*)text:(NSString*)text addToView:(UIImage*)image textColor:(UIColor*) color {
+    //设置字体样式
+    UIFont *font = [UIFont fontWithName:@"Arial-BoldItalicMT"size:32];
+    color = color ? color : [UIColor redColor];//默认为红色字体
+    NSDictionary *dict = @{NSFontAttributeName:font,NSForegroundColorAttributeName:color};
+    CGSize textSize = [text sizeWithAttributes:dict];
+    //绘制上下文
+    UIGraphicsBeginImageContext(image.size);
+    [image drawInRect:CGRectMake(0,0, image.size.width, image.size.height)];
+
+    int width = (image.size.width - textSize.width)/2;
+    int height = (image.size.height- textSize.height)/2;
+    CGRect re = {CGPointMake(width, height), textSize};
+
+    //此方法必须写在上下文才生效
+    [text drawInRect:re withAttributes:dict];
+    UIImage *newImage =UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
+
+//图片上添加图片,用于给图片添加水印
++ (UIImage*)image:(UIImage*)image addToImage:(UIImage*)bigImage{
+    CGFloat w = bigImage.size.width;
+    CGFloat h = bigImage.size.height;
+    
+    //bitmap上下文使用的颜色空间
+    CGColorSpaceRef colorSpace =CGColorSpaceCreateDeviceRGB();
+    
+    //绘制图形上下文
+    CGContextRef ref = CGBitmapContextCreate(NULL, w, h,8,444* bigImage.size.width, colorSpace,kCGImageAlphaPremultipliedFirst);
+    
+    //给bigImage画图
+    CGContextDrawImage(ref,CGRectMake(0,0, w, h), bigImage.CGImage);
+    CGContextDrawImage(ref,CGRectMake(w -100,100, image.size.width, image.size.height), image.CGImage);
+    
+    //合成图片
+    CGImageRef imageMasked = CGBitmapContextCreateImage(ref);
+    
+    //关闭图形上下文
+    CGContextClosePath(ref);
+    CGColorSpaceRelease(colorSpace);
+    return [UIImage imageWithCGImage:imageMasked];
+}
+
+
+//图片上添加View/截屏生成图片
++ (UIImage*)convertImageFromeView:(UIView*)view {
+    NSLog(@"%f", [UIScreen mainScreen].scale);
+    
+    //不加scale图片截屏会模糊
+    UIGraphicsBeginImageContextWithOptions(view.frame.size,NO, [UIScreen mainScreen].scale);
+    
+    //绘制图形上下文
+    CGContextRef ref = UIGraphicsGetCurrentContext();
+    [view.layer renderInContext:ref];
+    UIImage*image =UIGraphicsGetImageFromCurrentImageContext();
+    
+    //获取固定位置的图片(上面部分完成截屏功能,下面代码可不要)
+    CGImageRef imageRef = CGImageCreateWithImageInRect(image.CGImage,CGRectMake(200,300,100,100));
+    UIImage*img = [UIImage imageWithCGImage:imageRef];
+    UIGraphicsEndImageContext();
+    UIImageWriteToSavedPhotosAlbum(img,self,nil,nil);
+    return img;
+}
+
 @end

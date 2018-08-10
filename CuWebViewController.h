@@ -13,6 +13,7 @@
 #import "RDPSessionViewController.h"
 #import "CommonUtils.h"
 #import <Foundation/Foundation.h>
+#import "MyFloatButton.h"
 
 @interface CuWebViewController : UIViewController<UIWebViewDelegate, NSURLSessionDelegate>
 {
