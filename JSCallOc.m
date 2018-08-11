@@ -103,7 +103,6 @@
     [vminfo share].cuIp = url;
     NSLog(@"收到的ipurl:%@", url);
     
-    
     //默认处理这种格式的字符串“http://google.com/”
     NSMutableString *mUrl = [NSMutableString stringWithString:url];
     if ([mUrl containsString:@"http://"]) {
@@ -124,9 +123,29 @@
         [vminfo share].gatewaycheck=@"NO";
         NSLog(@"是内网！");
     } else if(isInnerIP == 1) {
-        [vminfo share].gatewaycheck=@"YES";
+        [vminfo share].gatewaycheck=@"YES ";
         NSLog(@"是外网！");
     }
+}
+
+
+-(void)openIpConfig:(NSString *)data {
+    NSDictionary *dic = @{@"filename":@"ipconfig",
+                          @"dirname":@"ipconfig"
+                          };
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"loadLocalHTML" object:nil userInfo:dic];
+}
+
+-(void)setFlag:(NSString *)data {
+    NSLog(@"[vminfo share].count:%i", [vminfo share].count);
+    [vminfo share].count ++;
+    if ([vminfo share].count == 1) {
+        //设置为0
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"setFlag" object:@"0" userInfo:nil];
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"setFlag" object:@"1" userInfo:nil];
+    }
+    
 }
 
 @end

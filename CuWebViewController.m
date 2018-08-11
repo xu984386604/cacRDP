@@ -30,10 +30,9 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stoppostMessageToservice:) name:@"stoppostMessageToservice" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postMessageToService:) name:@"postMessageToservice" object:nil];
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isExternalNetwork) name:@"isExternalNetwork" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadLocalHTMLbyNotice:) name:@"loadLocalHTML" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setFlag:) name:@"setFlag" object:nil];
     _connectInfo = [vminfo share];
-    
-    [self checkCookies]; //测试用
 }
 
 #pragma mark 网页加载
@@ -49,15 +48,50 @@
     myWebView.delegate=self;
     [myWebView loadRequest:myrequest];
     [self.view addSubview:myWebView];
+    //NSString *htmlString = [[[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName]  encoding:NSUTF8StringEncoding error:nil] autorelease];
+    //myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    //[myWebView loadHTMLString:htmlString baseURL:[NSURL fileURLWithPath:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:dirName]]];
+    //myWebView.delegate=self;
+    //[self.view addSubview:myWebView];
+   // if (_isNotFirstLoad) {
+    //    NSLog(@"_isNotFirstLoad");
+   // }
+    _isNotFirstLoad = YES;
 }
 
 //加载本地网页
 -(void) loadLocalHTML:(NSString*)filename  inDirectory:(NSString*) dirName{
-    NSString *htmlString = [[[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName]  encoding:NSUTF8StringEncoding error:nil] autorelease];
+    
     myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    [myWebView loadHTMLString:htmlString baseURL:[NSURL fileURLWithPath:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:dirName]]];
     myWebView.delegate=self;
+    
+
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName];
+    NSLog(@"filepath%@",filePath);
+    NSURL *url = [NSURL URLWithString:filePath];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [myWebView loadRequest:request];
     [self.view addSubview:myWebView];
+    //_isNotFirstLoad = YES;
+}
+
+//加载本地网页(notice)
+-(void) loadLocalHTMLbyNotice:(NSNotification*) notification {
+    NSString *filename = [[notification userInfo] objectForKey:@"filename"];
+    NSString *dirName = [[notification userInfo] objectForKey:@"dirname"];
+    //NSString *htmlString = [[[NSMutableString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName]  encoding:NSUTF8StringEncoding error:nil] autorelease];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName];
+    NSLog(@"filepath%@",filePath);
+    NSURL *url = [NSURL URLWithString:filePath];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [myWebView loadRequest:request];
+ 
+    //htmlString = [NSString stringWithFormat:htmlString, @"1"];
+    //NSLog(@"htmlString:%@", htmlString);
+    //myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    //[myWebView loadHTMLString:htmlString  baseURL:[NSURL fileURLWithPath:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:dirName]]];
+    // myWebView.delegate=self;
+    // [self.view addSubview:myWebView];
 }
 
 #pragma mark openrdp
@@ -189,7 +223,7 @@
         [self sendMessage: @"recoverMsg"];
         //每个300s发送一次
         if (![vminfo share].recoverTimer) {
-            [vminfo share].recoverTimer = [NSTimer scheduledTimerWithTimeInterval:60.0 target:self selector:@selector(sendTimerMessage:) userInfo:@{@"smsType":@"recoverMsg"} repeats:YES];
+            [vminfo share].recoverTimer = [NSTimer scheduledTimerWithTimeInterval:300.0 target:self selector:@selector(sendTimerMessage:) userInfo:@{@"smsType":@"recoverMsg"} repeats:YES];
         }
     }
 }
@@ -460,7 +494,7 @@
         }
         _isNotFirstLoad = YES;
     }
-    
+    NSLog(@"_isNotFirstLoad:%i", _isNotFirstLoad);
     return YES;
 }
 
@@ -496,10 +530,10 @@
 //悬浮按钮的点击事件
 - (void)floatTapAction:(MyFloatButton *)sender
 {
-    [[self view] makeToast:NSLocalizedString(@"马上返回cu界面", @"come back to cu interface") duration:ToastDurationNormal position:@"center"];
+    [[self view] makeToast:NSLocalizedString(@"马上返回cu界面", @"come back to cu interface") duration:2.0 position:@"center"];  //ToastDurationShort
     NSString *cuurl=[NSString stringWithFormat:@"%@/cu",[vminfo share].cuIp];
     NSURLRequest *myrequest=[NSURLRequest requestWithURL:[NSURL URLWithString:cuurl]];
-    [self performSelector:@selector(loadCuPage:) withObject:myrequest afterDelay:3.0f];
+    [self performSelector:@selector(loadCuPage:) withObject:myrequest afterDelay:2.0f];
     
     _isNotFirstLoad = YES;
 }
@@ -536,4 +570,14 @@
     }
 }
 
+
+-(void)setFlag:(NSNotification *)notification {
+    NSString* obj = (NSString*)[notification object];
+    if ([obj isEqualToString:@"0"]) {
+        [myWebView stringByEvaluatingJavaScriptFromString:@"insertIntoLocal('0');"];
+    } else {
+        [myWebView stringByEvaluatingJavaScriptFromString:@"insertIntoLocal('1');"];
+    }
+    
+}
 @end

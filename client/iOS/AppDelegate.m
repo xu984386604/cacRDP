@@ -59,17 +59,19 @@
 }
 
 - (void)cacSBStartBackgroundTask{
-    timer = [NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(sendMessage) userInfo:nil repeats:YES];
+    timer = [NSTimer scheduledTimerWithTimeInterval:300.0f target:self selector:@selector(sendMessage) userInfo:nil repeats:YES];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
     //开启一个后台任务
-    taskId = [application beginBackgroundTaskWithExpirationHandler:^{
-        //结束指定的任务
-        [application endBackgroundTask:taskId];
-    }];
-    [self cacSBStartBackgroundTask];
+    if ([vminfo share].cuIp) {
+        taskId = [application beginBackgroundTaskWithExpirationHandler:^{
+            //结束指定的任务
+            [application endBackgroundTask:taskId];
+        }];
+        [self cacSBStartBackgroundTask];
+    }
 }
 
 -(void)sendMessage {
@@ -83,6 +85,7 @@
     
     handleUrl = [handleUrl stringByAppendingString:@"cu/index.php/Home/Client/UpdateAppUseStatus"];
     jsonData = [vminfo share].multiRdpRecoverInfo;
+    NSLog(@"AppDelegate:发起请求的url：%@", handleUrl);
     NSLog(@"AppDelegate:准备发送recoverMsg信息");
     
     NSData *sendData = [NSJSONSerialization dataWithJSONObject:jsonData options:NSJSONWritingPrettyPrinted error:nil];
@@ -106,9 +109,11 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
     //进入前台后将发送的心跳的后台计时器失效，之后cuwebcontroller的runloop的心跳信息的timer会马上执行最近一次的任务
-    [timer invalidate];
-    timer = nil;
-    NSLog(@"AppDelegate:停止发送recoverMsg信息！");
+    if (timer) {
+        [timer invalidate];
+        timer = nil;
+        NSLog(@"AppDelegate:停止发送recoverMsg信息！");
+    }
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
