@@ -16,7 +16,7 @@
 
 #define bgwidth 300
 #define bgheight 70
-#define floatbtnH    46
+#define floatbtnH  46
 
 @interface MenuView()
 {

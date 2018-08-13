@@ -56,6 +56,8 @@
 @property(atomic, strong) NSMutableDictionary *multiRdpRecoverInfo; //保存多个远程应用的恢复信息
 @property(atomic, strong) NSMutableDictionary *multiRdpSession; //保存多个远程应用session
 
+@property (nonatomic,assign) int count;//网页跳转用
+
 +(instancetype) share;
 +(void) filterRecoverRdpinfoDic;
 @end

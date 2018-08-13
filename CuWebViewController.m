@@ -8,36 +8,31 @@
 
 #import "CuWebViewController.h"
 #import "Bookmark.h"
+#import "Toast+UIView.h"
 
 
-@interface CuWebViewController ()
+@interface CuWebViewController () <MyFloatButtonDelegate>
+{
+    MyFloatButton * _myfloatbutton;  //悬浮按钮
+}
 @property(nonatomic,strong)NSTimer * mytimer; //计时器
-
 @end
 
 @implementation CuWebViewController
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //初始化 http://172.20.156.109/
-    //[vminfo share].cuIp=@"http://172.20.100.11/";
-    //innerCuUrl=@"http://172.20.100.11/";
     innerNet=@"1"; //默认外网
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
-    
     [self loadLocalHTML:@"ipconfig" inDirectory:@"ipconfig"];
-    //判断内外网
-    //[self is_External_network];
     
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stoppostMessageToservice:) name:@"stoppostMessageToservice" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postMessageToService:) name:@"postMessageToservice" object:nil];
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isExternalNetwork) name:@"isExternalNetwork" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadLocalHTMLbyNotice:) name:@"loadLocalHTML" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setFlag:) name:@"setFlag" object:nil];
     _connectInfo = [vminfo share];
-    
-    [self checkCookies]; //测试用
 }
 
 #pragma mark 网页加载
@@ -53,15 +48,50 @@
     myWebView.delegate=self;
     [myWebView loadRequest:myrequest];
     [self.view addSubview:myWebView];
+    //NSString *htmlString = [[[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName]  encoding:NSUTF8StringEncoding error:nil] autorelease];
+    //myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    //[myWebView loadHTMLString:htmlString baseURL:[NSURL fileURLWithPath:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:dirName]]];
+    //myWebView.delegate=self;
+    //[self.view addSubview:myWebView];
+   // if (_isNotFirstLoad) {
+    //    NSLog(@"_isNotFirstLoad");
+   // }
+    _isNotFirstLoad = YES;
 }
 
 //加载本地网页
 -(void) loadLocalHTML:(NSString*)filename  inDirectory:(NSString*) dirName{
-    NSString *htmlString = [[[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName]  encoding:NSUTF8StringEncoding error:nil] autorelease];
+    
     myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    [myWebView loadHTMLString:htmlString baseURL:[NSURL fileURLWithPath:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:dirName]]];
     myWebView.delegate=self;
+    
+
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName];
+    NSLog(@"filepath%@",filePath);
+    NSURL *url = [NSURL URLWithString:filePath];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [myWebView loadRequest:request];
     [self.view addSubview:myWebView];
+    //_isNotFirstLoad = YES;
+}
+
+//加载本地网页(notice)
+-(void) loadLocalHTMLbyNotice:(NSNotification*) notification {
+    NSString *filename = [[notification userInfo] objectForKey:@"filename"];
+    NSString *dirName = [[notification userInfo] objectForKey:@"dirname"];
+    //NSString *htmlString = [[[NSMutableString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName]  encoding:NSUTF8StringEncoding error:nil] autorelease];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName];
+    NSLog(@"filepath%@",filePath);
+    NSURL *url = [NSURL URLWithString:filePath];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [myWebView loadRequest:request];
+ 
+    //htmlString = [NSString stringWithFormat:htmlString, @"1"];
+    //NSLog(@"htmlString:%@", htmlString);
+    //myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    //[myWebView loadHTMLString:htmlString  baseURL:[NSURL fileURLWithPath:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:dirName]]];
+    // myWebView.delegate=self;
+    // [self.view addSubview:myWebView];
 }
 
 #pragma mark openrdp
@@ -424,8 +454,13 @@
     //7. alipays://platformapi/startApp?appId=10000007&sourceId=excashierQrcodePay&actionType=route&qrcode=https%3A%2F%2Fqr.alipay.com%2Fupx00279er7br22tzsny6051
     //8. about:blank
     
+    if ([vminfo share].cuIp && [urlStr containsString:[vminfo share].cuIp]) {
+        [self removeAlipayFloatButton];
+    }
+    
     //判断是否是阿里支付的url
     if ([urlStr hasPrefix:@"alipays://"] || [urlStr hasPrefix:@"alipay://"]) {
+        [self loadAlipayFloatButton];
         //支付宝是否已经安装
         BOOL isExist = [[UIApplication sharedApplication] canOpenURL:reqUrl];
         if (!isExist) {
@@ -459,7 +494,7 @@
         }
         _isNotFirstLoad = YES;
     }
-    
+    NSLog(@"_isNotFirstLoad:%i", _isNotFirstLoad);
     return YES;
 }
 

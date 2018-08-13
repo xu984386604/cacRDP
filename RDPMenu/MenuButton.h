@@ -10,7 +10,4 @@
 
 @interface MenuButton : UIButton
 + (instancetype)buttonWithTitle:(NSString *)title imageTitle:(NSString *)imageTitle center:(CGPoint)point ;
-
-
-
 @end
