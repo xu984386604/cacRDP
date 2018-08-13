@@ -1,6 +1,7 @@
+// setWinAapp();
 if(isios()){
     var ipstatus = "0";
-    window.app.setFlag();
+   window.app.setFlag();
     $(function(){
         // $('.maskloading').removeClass('y-hide');
 
@@ -87,7 +88,7 @@ if(isios()){
                     timeout : 3000,
                     success:function(data,status,xhr){ //请求成功的回调函数
                         　　　if(xhr.status == 200){
-                            getCUAddress('http://'+ipstr+'/');
+                           getCUAddress('http://'+ipstr+'/');
                                 if(localStorage.getItem('lastip')){
                                     localStorage.setItem('lastip',ipstr);
                                 }else{
@@ -322,7 +323,8 @@ function renderselect(){
                     ipstr = ipstr +'.'+ $(this).val()
                 }
             })
-            if(flag && (ipstr !=='undefined:')){
+            // if(flag && (ipstr !=='undefined:')){
+                if(flag && (ipstr !=='undefined:')){
                 console.log(ipstr)
                 if($('.y-port').val()){
                     ipstr =ipstr + ':' + $('.y-port').val();
@@ -373,27 +375,57 @@ function hasParent( e, p ) {
     }
     return (el!==false);
 };
+
+//判断ip地址是否合法
 function isValidIP(ip) {
     var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
     return reg.test(ip);
 } 
+
+//与客户端通信，向客户端发送当前打开的ip地址
 function getCUAddress(ipurl){
     window.app.getCUAddress(JSON.stringify({url:ipurl}))
 };
+
+//与安卓端通信，确定页面跳转方向
 function getjumpfrom(){
-    window.app.getjumpfrom()
+    return window.app.getjumpfrom()
 }
 
+//判断客户端是否是ios
 function isios(){
     var u = navigator.userAgent;
     var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
     return isiOS;
 }
+
+//与ios通信，ios调用该函数，确定页面方向
 function insertIntoLocal(flag){
     ipstatus = flag;
 }
 
+//与ios通信，让ios调用页面上的insertIntoLocal函数，确定页面的跳转方向
 function setFlag(){
     window.app.setFlag();
 
+}
+
+//window端设置window.app对象
+function setWinAapp(){
+    /*连接windows客户端时与其建立通道，获得app对象*/
+    if(navigator.userAgent.indexOf('Windows') !=-1){
+        var script = document.createElement('script');
+        script.src = "./static/js/qwebchannel.js";
+        document.body.appendChild(script);
+        var buildChannel = function(){
+            if(typeof QWebChannel != 'undefined'){
+                new QWebChannel(qt.webChannelTransport,function(channel){
+                    window.channel = channel;
+                    window.app = channel.objects.app;
+                    app.hideHomeButton();
+                    console.log(channel);
+                })
+            }
+        }
+    }
 }

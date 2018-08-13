@@ -529,9 +529,9 @@
 
 -(UIInterfaceOrientationMask)supportedInterfaceOrientations{
     return UIInterfaceOrientationMaskPortrait;
+    
 //悬浮按钮的点击事件
-- (void)floatTapAction:(MyFloatButton *)sender
-{
+- (void)floatTapAction:(MyFloatButton *)sender{
     [[self view] makeToast:NSLocalizedString(@"马上返回cu界面", @"come back to cu interface") duration:2.0 position:@"center"];  //ToastDurationShort
     NSString *cuurl=[NSString stringWithFormat:@"%@/cu",[vminfo share].cuIp];
     NSURLRequest *myrequest=[NSURLRequest requestWithURL:[NSURL URLWithString:cuurl]];
