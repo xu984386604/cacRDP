@@ -491,5 +491,9 @@
         [storage deleteCookie:cookie];
     }
 }
+
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations{
+    return UIInterfaceOrientationMaskPortrait;
+}
    
 @end

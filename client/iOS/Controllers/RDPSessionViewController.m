@@ -533,6 +533,7 @@
     switch (tag) {
         case 1:
             [self toggleKeyboard:nil];
+            [self myfunction];
             break;
         case 2:
             [self toggleTouchPointer:nil];
@@ -552,6 +553,24 @@
     
     
 }
+//弹出键盘的时候遮挡悬浮按钮处理事件
+-(void)myfunction
+{
+    CGPoint temp = _myfloatbutton.center;
+    CGFloat myfloat = SCREEN_HEIGHT  / 3;  //宽度的1/3
+    if (temp.y - myfloat > 0) {
+        temp.y = SCREEN_HEIGHT / 3 ;
+        NSLog(@"%f",SCREEN_HEIGHT);
+        [UIView animateWithDuration:0.2 animations:^{
+            [_myfloatbutton setCenter:temp];
+        }];
+        [vminfo share].mypoint = temp;
+    }
+    
+}
+
+
+
 
 - (void)sessionWillDisconnect:(RDPSession*)session
 {
@@ -940,7 +959,6 @@
 	}
 	
 	CGFloat shiftHeight = _keyboard_last_height - previousHeight;
-	
 	[UIView beginAnimations:nil context:NULL];
     [UIView setAnimationCurve:[[[notification userInfo] objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
