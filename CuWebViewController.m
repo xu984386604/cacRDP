@@ -529,6 +529,58 @@
 
 -(UIInterfaceOrientationMask)supportedInterfaceOrientations{
     return UIInterfaceOrientationMaskPortrait;
+//悬浮按钮的点击事件
+- (void)floatTapAction:(MyFloatButton *)sender
+{
+    [[self view] makeToast:NSLocalizedString(@"马上返回cu界面", @"come back to cu interface") duration:2.0 position:@"center"];  //ToastDurationShort
+    NSString *cuurl=[NSString stringWithFormat:@"%@/cu",[vminfo share].cuIp];
+    NSURLRequest *myrequest=[NSURLRequest requestWithURL:[NSURL URLWithString:cuurl]];
+    [self performSelector:@selector(loadCuPage:) withObject:myrequest afterDelay:2.0f];
+    
+    _isNotFirstLoad = YES;
 }
-   
+
+-(void) loadCuPage:(NSURLRequest*) myrequest {
+    [UIView animateWithDuration:1.0f animations:^{
+        [myWebView removeFromSuperview];
+        myWebView = [[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        [self.view addSubview:myWebView];
+        myWebView.delegate = self;
+        [myWebView loadRequest:myrequest];
+    }];
+}
+
+//加载支付宝支付的浮动按钮
+- (void) loadAlipayFloatButton {
+    if(!_myfloatbutton) {
+        _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176, 46, 46)];
+        [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176);
+        _myfloatbutton.alpha=0.5;
+        _myfloatbutton.delegate=self;
+        _myfloatbutton.bannerIV.image= [CommonUtils text:@"返回" addToView:[UIImage imageNamed:@"menu.png"] textColor:[UIColor redColor]];
+        
+        [self.view addSubview:_myfloatbutton];
+    }
+}
+
+//移除支付宝支付的浮动按钮
+- (void) removeAlipayFloatButton {
+    if(_myfloatbutton) {
+        _myfloatbutton.hidden = YES;
+        [self.view willRemoveSubview:_myfloatbutton];
+        _myfloatbutton = nil;
+    }
+}
+
+
+-(void)setFlag:(NSNotification *)notification {
+    NSString* obj = (NSString*)[notification object];
+    if ([obj isEqualToString:@"0"]) {
+        [myWebView stringByEvaluatingJavaScriptFromString:@"insertIntoLocal('0');"];
+    } else {
+        [myWebView stringByEvaluatingJavaScriptFromString:@"insertIntoLocal('1');"];
+    }
+    
+    }
+}
 @end
