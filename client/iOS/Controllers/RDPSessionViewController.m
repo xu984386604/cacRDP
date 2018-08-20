@@ -573,10 +573,9 @@
 - (void)sessionDidDisconnect:(RDPSession*)session
 {
     //想服务器发送关闭指令
-    
     [self closeOpenRdp];
-    
     [self dismissViewControllerAnimated:YES completion:NULL];
+    
 }
 
 #pragma mark close rdp

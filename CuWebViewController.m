@@ -9,7 +9,11 @@
 #import "CuWebViewController.h"
 #import "Bookmark.h"
 #import "Toast+UIView.h"
+#import <CommonCrypto/CommonDigest.h>
 
+
+#define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
+#define SCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
 
 @interface CuWebViewController () <MyFloatButtonDelegate>
 {
@@ -32,7 +36,13 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postMessageToService:) name:@"postMessageToservice" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadLocalHTMLbyNotice:) name:@"loadLocalHTML" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setFlag:) name:@"setFlag" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(myAppEnterBackground:) name:@"appEnterbackGround" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showParamErrorMessage) name:@"paramErrorMessage" object:nil];
+    
     _connectInfo = [vminfo share];
+    
 }
 
 #pragma mark 网页加载
@@ -527,9 +537,12 @@
     }
 }
 
--(UIInterfaceOrientationMask)supportedInterfaceOrientations{
+//屏幕支持的方向
+
+/*-(UIInterfaceOrientationMask)supportedInterfaceOrientations{
     return UIInterfaceOrientationMaskPortrait;
-    
+}*/
+
 //悬浮按钮的点击事件
 - (void)floatTapAction:(MyFloatButton *)sender{
     [[self view] makeToast:NSLocalizedString(@"马上返回cu界面", @"come back to cu interface") duration:2.0 position:@"center"];  //ToastDurationShort
@@ -581,6 +594,98 @@
         [myWebView stringByEvaluatingJavaScriptFromString:@"insertIntoLocal('1');"];
     }
     
+}
+
+#pragma mark 屏幕旋转
+-(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    
+    CGAffineTransform transform;
+    transform = CGAffineTransformRotate(myWebView.transform, M_PI/2.0);
+    [UIView beginAnimations:@"roate" context:nil];
+    [UIView setAnimationDuration:0.4];
+    [UIView setAnimationDelegate:self];
+    [UIView animateWithDuration:0.4 animations:^{
+    
+        myWebView.frame = CGRectMake(0, 0,
+                                     self.view.frame.size.width, self.view.frame.size.height);
+    }];
+    
+    [UIView commitAnimations];
+
+   
+}
+
+#pragma mark 进入后台
+-(void)myAppEnterBackground:(id)num{
+    [UIView beginAnimations:@"exitApplication" context:nil];
+    [UIView setAnimationDuration:0.3];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:self.view.window cache:NO];
+    [UIView setAnimationDidStopSelector:@selector(animationFinished:finished:contex:)];
+    self.view.window.bounds = CGRectMake(0, 0, 0, 0);
+    [UIView commitAnimations];
+    
+}
+
+-(void)animationFinished:(NSString *)animationID finished:(NSNumber *)finished contex:(void *)context{
+    if([animationID compare:@"exitApplication"] == 0)
+    {
+        exit(0);
     }
 }
+
+#pragma mark MD5校验
+-(NSString *)fileMD5:(NSString *)indexPath{
+    NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath:indexPath];
+    if ( handle == nil ) {
+        return @"ERROR GETTING FILE MD5";
+    }
+    CC_MD5_CTX md5;
+    CC_MD5_Init(&md5);
+    BOOL done = NO;
+    while (!done) {
+        
+        NSData * fileData = [handle readDataOfLength:256];
+        CC_MD5_Update(&md5, [fileData bytes], [fileData length]);
+        if( [fileData length] == 0 ) done = YES;
+        
+    }
+    
+    unsigned char digest[CC_MD5_DIGEST_LENGTH];
+    CC_MD5_Final(digest, &md5);
+    
+    NSString * s =[NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+                   digest[0],digest[1],
+                   digest[2],digest[3],
+                   digest[4],digest[5],
+                   digest[6],digest[7],
+                   digest[8],digest[9],
+                   digest[10],digest[11],
+                   digest[12],digest[13],
+                   digest[14],digest[15]];
+    return s;
+}
+
+
+//传入的参数错误，提示错误信息
+-(void)showParamErrorMessage
+{
+
+    UIAlertController * myalert = [UIAlertController alertControllerWithTitle:@"错误提示" message:@"参数错误，无法打开" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction * defaultaction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil];
+    [myalert addAction:defaultaction];
+    
+    [myalert addAction:defaultaction];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self presentViewController:myalert animated:YES completion:nil];
+    });
+
+}
+
+
+
+
+
+
 @end

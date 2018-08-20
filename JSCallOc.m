@@ -39,7 +39,12 @@
     NSString* remoteProgram=[_dic objectForKey:@"remoteProgram"];
     myinfo.appid = [_dic objectForKey:@"id"];
     myinfo.uid = [_dic objectForKey:@"username"];
-
+    
+   
+    
+    
+    
+    
      //docker应用处理
     NSString *apptype=[_dic objectForKey:@"appType"];
     if([apptype isEqualToString:@"lca"])
@@ -55,8 +60,45 @@
     
     myinfo.remoteProgram=[NSString  stringWithFormat:@"opener.exe %@", remoteProgram];
     //接收的数据不为空则可以调用来打开RDP
-    [self openRdp];
+    BOOL is_every_param_ok = YES;
+    
+    if(!myinfo.vmusername || !myinfo.vmpasswd || !myinfo.vmip || !myinfo.vmport )
+    {
+        is_every_param_ok = NO;
+    }
+    if([[vminfo share].gatewaycheck isEqualToString:@"YES"])
+    {
+        if(!myinfo.tsip || !myinfo.tspwd ||!myinfo.tsport || !myinfo.tsusername)
+        {
+            is_every_param_ok = NO;
+        }
+    }
+    if([apptype isEqualToString:@"lca"])
+    {
+        if(!myinfo.dockerId || !myinfo.dockerIp || !myinfo.dockerPort
+           ||!myinfo.dockerVncPwd || !myinfo.appid)
+            
+        {
+            is_every_param_ok = NO;
+        }
+    }
+    
+    if(is_every_param_ok)
+    {
+        [self openRdp];
+
+    }else
+    {
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:@"paramErrorMessage" object:nil];
+    }
 }
+
+
+
+
+
+
 
 /*****************************
  
@@ -118,12 +160,13 @@
     int isInnerIP = [CommonUtils isInnerIP:mUrl];
     //-1代表错误，1代表外网，0代表内网
     if(isInnerIP == -1) {
-        NSLog(@"无法判断内外网！凉凉..........");
+        NSLog(@"无法判断内外网！凉凉..........  暂时当做外网处理");
+        [vminfo share].gatewaycheck = @"YES";
     } else if(isInnerIP == 0) {
-        [vminfo share].gatewaycheck=@"NO";
+        [vminfo share].gatewaycheck = @"NO";
         NSLog(@"是内网！");
     } else if(isInnerIP == 1) {
-        [vminfo share].gatewaycheck=@"YES ";
+        [vminfo share].gatewaycheck = @"YES";
         NSLog(@"是外网！");
     }
 }
@@ -147,5 +190,12 @@
     }
     
 }
+-(void)appEnterBackground:(id)num
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"appEnterbackGround" object:nil];
+    
+}
+
+
 
 @end
