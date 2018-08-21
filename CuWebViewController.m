@@ -14,6 +14,9 @@
 
 #define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
 #define SCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
+#define LOCALMD5      @"af534b6a413b2394ec682f47cabdaae6"
+
+
 
 @interface CuWebViewController () <MyFloatButtonDelegate>
 {
@@ -28,7 +31,14 @@
     innerNet=@"1"; //默认外网
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
-    [self loadLocalHTML:@"ipconfig" inDirectory:@"ipconfig"];
+    BOOL md5check=[self MD5check];
+    if(md5check)
+    {
+        [self loadLocalHTML:@"ipconfig" inDirectory:@"ipconfig"];
+    }
+   
+    
+
     
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
@@ -667,14 +677,41 @@
     return s;
 }
 
+-(BOOL)MD5check
+{
+    
+    NSString *filepath= [[NSBundle mainBundle] pathForResource:@"ipconfig" ofType:@"html" inDirectory:@"ipconfig"];
+    NSLog(@"%@",filepath);
+    NSString *resultMD5=[self fileMD5:filepath];
+    if ([resultMD5 isEqualToString:LOCALMD5]) {
+        return YES;
+    }else
+    {
+        [self showMD5CheckAlert]; //错误提示
+        return NO;
+    }
+    
+}
+//md5校验 错误提示信息
+-(void)showMD5CheckAlert
+{
+    UIAlertController * myalert = [UIAlertController alertControllerWithTitle:@"安全提示" message:@"本地文件被篡改，拒绝加载" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction * defaultaction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil];
+    
+    [myalert addAction:defaultaction];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self presentViewController:myalert animated:YES completion:nil];
+    });
 
+    
+    
+}
 //传入的参数错误，提示错误信息
 -(void)showParamErrorMessage
 {
 
     UIAlertController * myalert = [UIAlertController alertControllerWithTitle:@"错误提示" message:@"参数错误，无法打开" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction * defaultaction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil];
-    [myalert addAction:defaultaction];
     
     [myalert addAction:defaultaction];
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -682,6 +719,7 @@
     });
 
 }
+
 
 
 
