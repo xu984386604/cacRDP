@@ -858,7 +858,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
     if (self) {
 		_progress = 0.f;
 		_lineColor = [UIColor whiteColor];
-		_progressColor = [UIColor whiteColor];
+		_progressColor = [UIColor greenColor];
 		_progressRemainingColor = [UIColor clearColor];
 		self.backgroundColor = [UIColor clearColor];
 		self.opaque = NO;

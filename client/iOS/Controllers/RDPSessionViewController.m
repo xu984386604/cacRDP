@@ -366,8 +366,8 @@
     [[NSBundle mainBundle] loadNibNamed:@"RDPConnectingView" owner:self options:nil];
     
     // set strings
-    [_lbl_connecting setText:NSLocalizedString(@"Connecting", @"Connecting progress view - label")];
-    [_cancel_connect_button setTitle:NSLocalizedString(@"Cancel", @"Cancel Button") forState:UIControlStateNormal];
+    [_lbl_connecting setText:NSLocalizedString(@"连接中....", @"Connecting progress view - label")];
+    [_cancel_connect_button setTitle:NSLocalizedString(@"取消", @"Cancel Button") forState:UIControlStateNormal];
     
     // center view and give it round corners
     [_connecting_view setCenter:[[self view] center]];
@@ -375,6 +375,9 @@
 
     // display connecting view and start indicator
     [[self view] addSubview:_connecting_view];
+    UIColor *bgColor = [UIColor colorWithPatternImage: [UIImage imageNamed:@"Default-Landscape@2x~ipad"]];
+    [[self view] setBackgroundColor:bgColor];
+
     [_connecting_indicator_view startAnimating];
 }
 
@@ -399,6 +402,8 @@
     //[[self view] se
     // display connecting view and start indicator
     [[self view] addSubview:_connected_view];
+    
+    
     [_connected_indicator_view startAnimating];
     
     timer_connected=[NSTimer scheduledTimerWithTimeInterval:5
@@ -434,7 +439,10 @@
     //is_connect=YES;
     //登陆成功关掉计时器
     if(is_timeup) //计时器没到时才关闭
-        [timer invalidate]; //关闭计时器。。。
+        if (timer) {
+            [timer invalidate]; //关闭计时器。。。
+
+        }
     [[self view] makeToast:NSLocalizedString(@"接入云端成功", @"success to connect message") duration:ToastDurationNormal position:@"center"];
     
     //new add 2缩放
@@ -452,6 +460,7 @@
     // remove and release connecting view
     [_connecting_indicator_view stopAnimating];
     [_connecting_view removeFromSuperview];
+    [[self view] setBackgroundColor:nil];
     [_connecting_view autorelease];   
     
     // check if session settings changed ...
