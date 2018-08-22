@@ -10,6 +10,7 @@
 #import "Bookmark.h"
 #import "Toast+UIView.h"
 #import <CommonCrypto/CommonDigest.h>
+#import "FontAwesome/NSString+FontAwesome.h"
 
 
 #define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
@@ -580,7 +581,9 @@
         [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176);
         _myfloatbutton.alpha=0.5;
         _myfloatbutton.delegate=self;
-        _myfloatbutton.bannerIV.image= [CommonUtils text:@"返回" addToView:[UIImage imageNamed:@"menu.png"] textColor:[UIColor redColor]];
+        
+        NSString *fontIcon = [NSString fontAwesomeIconStringForEnum:FAIconArrowLeft];
+        _myfloatbutton.bannerIV.image= [CommonUtils text:fontIcon addToView:[UIImage imageNamed:@"menu.png"] textColor:[UIColor redColor]];
         
         [self.view addSubview:_myfloatbutton];
     }
@@ -719,11 +722,5 @@
     });
 
 }
-
-
-
-
-
-
 
 @end

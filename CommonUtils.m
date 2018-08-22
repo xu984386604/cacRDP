@@ -9,7 +9,7 @@
 #import "CommonUtils.h"
 #import <netdb.h>
 #import <arpa/inet.h>
-
+#import "client/iOS/FontAwesome/NSString+FontAwesome.h"
 
 @implementation CommonUtils
 
@@ -116,7 +116,9 @@ bool IsInner(unsigned int userIp, unsigned int begin, unsigned int end)
 
 + (UIImage*)text:(NSString*)text addToView:(UIImage*)image textColor:(UIColor*) color {
     //设置字体样式
-    UIFont *font = [UIFont fontWithName:@"Arial-BoldItalicMT"size:32];
+    //UIFont *font = [UIFont fontWithName:@"Arial-BoldItalicMT" size:32];
+    UIFont *font = [UIFont fontWithName:kFontAwesomeFamilyName size:32];
+    NSLog(@"字体有：%@", [UIFont familyNames]);
     color = color ? color : [UIColor redColor];//默认为红色字体
     NSDictionary *dict = @{NSFontAttributeName:font,NSForegroundColorAttributeName:color};
     CGSize textSize = [text sizeWithAttributes:dict];
