@@ -54,6 +54,11 @@
 //判断连接的服务器相对于本机为内网还是外网, -1代表错误，1代表外网，0代表内网
 + (int)isInnerIP:(NSString *)hostName
 {
+    //去除端口号
+    NSRange range = [hostName rangeOfString:@":"];
+    if (range.location != NSNotFound) {
+        hostName = [hostName substringWithRange:NSMakeRange(0, range.location)];
+    }
     BOOL bValid = false;
     bool _isInnerIp = false;
     //NSString to char*
@@ -114,10 +119,10 @@ bool IsInner(unsigned int userIp, unsigned int begin, unsigned int end)
 
 #pragma mark - 将文字添加到图片的方法实现
 
-+ (UIImage*)text:(NSString*)text addToView:(UIImage*)image textColor:(UIColor*) color {
++ (UIImage*)text:(NSString*)text addToView:(UIImage*)image textColor:(UIColor*) color textSize:(CGFloat) fontSize {
     //设置字体样式
     //UIFont *font = [UIFont fontWithName:@"Arial-BoldItalicMT" size:32];
-    UIFont *font = [UIFont fontWithName:kFontAwesomeFamilyName size:32];
+    UIFont *font = [UIFont fontWithName:kFontAwesomeFamilyName size:fontSize];
     NSLog(@"字体有：%@", [UIFont familyNames]);
     color = color ? color : [UIColor redColor];//默认为红色字体
     NSDictionary *dict = @{NSFontAttributeName:font,NSForegroundColorAttributeName:color};
@@ -181,6 +186,22 @@ bool IsInner(unsigned int userIp, unsigned int begin, unsigned int end)
     UIGraphicsEndImageContext();
     UIImageWriteToSavedPhotosAlbum(img,self,nil,nil);
     return img;
+}
+
+
+//改变图片的透明度
++ (UIImage*)imageByApplyingAlpha:(CGFloat) alpha image:(UIImage*) image {
+    UIGraphicsBeginImageContextWithOptions(image.size,NO,0.0f);
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    CGRect area = CGRectMake(0,0, image.size.width, image.size.height);
+    CGContextScaleCTM(ctx,1, -1);
+    CGContextTranslateCTM(ctx,0, -area.size.height);
+    CGContextSetBlendMode(ctx,kCGBlendModeMultiply);
+    CGContextSetAlpha(ctx, alpha);
+    CGContextDrawImage(ctx, area, image.CGImage);
+    UIImage* newImage =UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage; 
 }
 
 @end

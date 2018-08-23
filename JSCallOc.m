@@ -160,8 +160,8 @@
     int isInnerIP = [CommonUtils isInnerIP:mUrl];
     //-1代表错误，1代表外网，0代表内网
     if(isInnerIP == -1) {
-        NSLog(@"无法判断内外网！凉凉..........  暂时当做外网处理");
-        [vminfo share].gatewaycheck = @"YES";
+        NSLog(@"无法判断内外网！凉凉..........");
+        //[vminfo share].gatewaycheck = @"YES";
     } else if(isInnerIP == 0) {
         [vminfo share].gatewaycheck = @"NO";
         NSLog(@"是内网！");
