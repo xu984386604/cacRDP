@@ -26,6 +26,7 @@
 #define AUTOSCROLLDISTANCE 20
 #define AUTOSCROLLTIMEOUT 0.05
 
+
 @interface RDPSessionViewController (Private)<MyFloatButtonDelegate>
 -(void)showSessionToolbar:(BOOL)show;
 -(UIToolbar*)keyboardToolbar;
@@ -67,7 +68,6 @@
         
         //menu显示状态
         ISShowMenuButton = NO;
-
         
         [UIView setAnimationDelegate:self];
         [UIView setAnimationDidStopSelector:@selector(animationStopped:finished:context:)];
@@ -470,6 +470,7 @@
     
     //挂载网盘第一次
     [self postDataWhenFirstOpenRdp];
+   
 
 }
 
@@ -572,13 +573,14 @@
 //返回最初的界面
 - (void)sessionDidDisconnect:(RDPSession*)session
 {
-    //想服务器发送关闭指令
+    //向服务器发送关闭指令
     [self closeOpenRdp];
     [self dismissViewControllerAnimated:YES completion:NULL];
     
 }
 
 #pragma mark close rdp
+
 //关闭rdp
 -(void)closeOpenRdp
 {
@@ -586,36 +588,24 @@
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/SendMessageToAgent",cuip];
     
     NSURL *url=[NSURL URLWithString:Reset_vm_User];
-    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
+        NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
     myrequest.HTTPMethod=@"POST";
     [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
 
-    NSDictionary *json=@{
+    NSDictionary *data=@{
                          @"vmusername":[vminfo share].vmusername,
                          @"ip":[vminfo share].vmip,
                          @"type":@"logoff"
                          };
 
-    NSData *data=[NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest.HTTPBody=data;
+    NSData *jsondata = [NSJSONSerialization dataWithJSONObject:data options:NSJSONWritingPrettyPrinted error:nil];
+    myrequest.HTTPBody = jsondata;
     
-    NSData *recvData=[NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
-    if(recvData !=nil)
-    {
+    
+    NSURLSession *mysession = [NSURLSession sharedSession];
+     [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
-        NSError *err;
-        NSMutableDictionary *dic=[NSJSONSerialization JSONObjectWithData:recvData options:NSJSONWritingPrettyPrinted error:&err];
-        if(err)
-        {
-            NSLog(@"关闭rdp解析返回数据失败");
-        }//if
-        else{
-            NSNumber *mycode=[dic objectForKey:@"code"];
-            //mycode的值是800表示正确关闭
-            NSLog(@"%@",mycode);
-        }//else
-        
-    }//if
+    }];
     
     if([[vminfo share].apptype isEqualToString:@"lca"])
     {
@@ -644,10 +634,10 @@
     NSData *data=[NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:nil];
     myrequest.HTTPBody=data;
     
-    [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
-    
-
-
+    NSURLSession *mysession = [NSURLSession sharedSession];
+    [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+    }];
 }
 
 //这里是屏幕缩放相关
