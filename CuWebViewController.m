@@ -10,6 +10,7 @@
 #import "Bookmark.h"
 #import "Toast+UIView.h"
 #import <CommonCrypto/CommonDigest.h>
+#import "FontAwesome/NSString+FontAwesome.h"
 
 
 #define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
@@ -576,11 +577,16 @@
 //加载支付宝支付的浮动按钮
 - (void) loadAlipayFloatButton {
     if(!_myfloatbutton) {
-        _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176, 46, 46)];
-        [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176);
+        _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 60, SCREEN_HEIGHT-176, 46, 46)];
+        [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH - 60, SCREEN_HEIGHT - 176);
         _myfloatbutton.alpha=0.5;
         _myfloatbutton.delegate=self;
-        _myfloatbutton.bannerIV.image= [CommonUtils text:@"返回" addToView:[UIImage imageNamed:@"menu.png"] textColor:[UIColor redColor]];
+        
+        UIColor *fontIconColor = [UIColor colorWithRed:210 green:210 blue:210 alpha:0.8];
+        NSString *fontIcon = [NSString fontAwesomeIconStringForEnum:FAIconArrowLeft];
+                UIImage *menuPicWithAlpha = [CommonUtils imageByApplyingAlpha:0.8 image:[UIImage imageNamed:@"menu.png"]];
+        
+        _myfloatbutton.bannerIV.image= [CommonUtils text:fontIcon addToView:menuPicWithAlpha textColor:fontIconColor textSize:38];
         
         [self.view addSubview:_myfloatbutton];
     }
@@ -719,11 +725,5 @@
     });
 
 }
-
-
-
-
-
-
 
 @end
