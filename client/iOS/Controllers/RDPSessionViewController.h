@@ -47,7 +47,7 @@ BOOL is_closed;
     // new add
     RDPSession *r_session;
     RDPSessionView *r_session_view;
-    
+    UIImageView* _connectingBackgroundView; //加载sessionView的等待背景
     
     
     

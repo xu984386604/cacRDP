@@ -40,11 +40,6 @@
     myinfo.appid = [_dic objectForKey:@"id"];
     myinfo.uid = [_dic objectForKey:@"username"];
     
-   
-    
-    
-    
-    
      //docker应用处理
     NSString *apptype=[_dic objectForKey:@"appType"];
     if([apptype isEqualToString:@"lca"])
