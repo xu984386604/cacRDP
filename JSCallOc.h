@@ -23,5 +23,5 @@
 -(void)getCUAddress:(NSString *)ipUrl;
 -(void)openIpConfig:(NSString *)data;
 -(void)setFlag:(NSString *)data;
--(void)exitApp:(id)num;  //程序退出
+-(void)appEnterBackground:(id)num;  //程序退出
 @end

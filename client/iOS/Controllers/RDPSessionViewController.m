@@ -588,7 +588,9 @@
 - (void)sessionDidDisconnect:(RDPSession*)session
 {
     //向服务器发送关闭指令
-    [self closeOpenRdp];
+    [self performSelector:@selector(closeOpenRdp) withObject:nil];
+    //[self closeOpenRdp];
+    
     [self dismissViewControllerAnimated:YES completion:NULL];
     
 }
