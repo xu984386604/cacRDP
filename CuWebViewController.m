@@ -33,14 +33,11 @@
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
     BOOL md5check=[self MD5check];
-    if(md5check)
+    if(!md5check)
     {
-        [self loadLocalHTML:@"ipconfig" inDirectory:@"ipconfig"];
+        [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
     }
    
-    
-
-    
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stoppostMessageToservice:) name:@"stoppostMessageToservice" object:nil];
@@ -49,11 +46,9 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setFlag:) name:@"setFlag" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(myAppEnterBackground:) name:@"appEnterbackGround" object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showParamErrorMessage) name:@"paramErrorMessage" object:nil];
     
     _connectInfo = [vminfo share];
-    
 }
 
 #pragma mark 网页加载
@@ -81,38 +76,30 @@
 }
 
 //加载本地网页
--(void) loadLocalHTML:(NSString*)filename  inDirectory:(NSString*) dirName{
-    
+-(void) loadLocalHTML:(NSString*) fileName  inDirectory:(NSString*) dirName{
     myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     myWebView.delegate=self;
-    
 
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName];
-    NSLog(@"filepath%@",filePath);
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"html" inDirectory:dirName];
+    filePath = [NSString stringWithFormat:@"%@?isAutoLogin=1", filePath]; //1代表应用第一次打开登录页面
+    NSLog(@"local_filepath：%@",filePath);
     NSURL *url = [NSURL URLWithString:filePath];
+    
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [myWebView loadRequest:request];
     [self.view addSubview:myWebView];
-    //_isNotFirstLoad = YES;
 }
 
 //加载本地网页(notice)
 -(void) loadLocalHTMLbyNotice:(NSNotification*) notification {
     NSString *filename = [[notification userInfo] objectForKey:@"filename"];
     NSString *dirName = [[notification userInfo] objectForKey:@"dirname"];
-    //NSString *htmlString = [[[NSMutableString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName]  encoding:NSUTF8StringEncoding error:nil] autorelease];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName];
-    NSLog(@"filepath%@",filePath);
+    filePath = [NSString stringWithFormat:@"%@?isAutoLogin=0", filePath]; //0代表 点注销跳回登录页面
+    NSLog(@"notice-filepath：%@",filePath);
     NSURL *url = [NSURL URLWithString:filePath];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [myWebView loadRequest:request];
- 
-    //htmlString = [NSString stringWithFormat:htmlString, @"1"];
-    //NSLog(@"htmlString:%@", htmlString);
-    //myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    //[myWebView loadHTMLString:htmlString  baseURL:[NSURL fileURLWithPath:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:dirName]]];
-    // myWebView.delegate=self;
-    // [self.view addSubview:myWebView];
 }
 
 #pragma mark openrdp
@@ -270,6 +257,7 @@
     [self sendMessage:smsType];
 }
 
+//往cu发送信息
 -(void)sendMessage:(NSString*) smsType
 {
     NSString *ip=[vminfo share].cuIp;
@@ -297,8 +285,6 @@
     
     NSLog(@"发起请求的url：%@", handleUrl);
     [self makeRequestToServer:handleUrl withDictionary:jsonData byHttpMethod:@"POST" msgType:smsType];
-    
-    //NSData *recvData = [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
 }
 
 //向服务器发起请求，因是异步执行，故返回的数据不能立即得到，所以需要在回调函数里面进行处理，可以采用在参数里面加一个回调函数的参数传入
@@ -359,81 +345,12 @@
     _mytimer = nil;
 }
 
-#pragma mark 判断是否是外网
--(void) isExternalNetwork
-{
-    NSString * urlStr=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/checkNet",innerCuUrl];
-    NSURL *myurl=[NSURL URLWithString:urlStr];
-    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:myurl];
-    myrequest.HTTPMethod=@"GET";
-    NSHTTPURLResponse *response;
-    NSError *err=nil;
-    myrequest.timeoutInterval=3.0;
-    
-    [NSURLConnection sendSynchronousRequest:myrequest returningResponse:&response error:&err];
-    if(!err)
-    {
-        NSInteger mycode=[response statusCode];
-        if(mycode == 200)
-        {
-            innerNet=@"1";  //是内网
-        }else
-        {
-            innerNet=@"0";   //外网
-        }
-        
-    }else
-    {
-        innerNet=@"0";   //外网
-    }
-    //服务器是否让访问
-    NSString *urlstr2=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/getServerIp",cuIp];
-    NSURL *url2=[NSURL URLWithString:urlstr2];
-    NSMutableURLRequest *myrequest2=[NSMutableURLRequest requestWithURL:url2];
-    myrequest2.HTTPMethod=@"POST";
-    myrequest2.timeoutInterval=3.0;
-    
-    [myrequest2 setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    
-    NSDictionary *json=@{
-                         @"innerNet":innerNet
-                         };
-    
-    NSData *data=[NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest2.HTTPBody=data;
-    
-    NSData *recvData=[NSURLConnection sendSynchronousRequest:myrequest2 returningResponse:nil error:nil];
-    
-    NSNumber *codenum=nil;
-    if (recvData != nil) {
-        NSDictionary *dic=[NSJSONSerialization JSONObjectWithData:recvData options:NSJSONWritingPrettyPrinted error:nil];
-        codenum=[dic objectForKey:@"code"];
-    }
-    
-    if([codenum isEqualToNumber:[NSNumber numberWithInteger:800]])
-    {
-        if([innerNet isEqualToString:@"1"])
-        {
-            [vminfo share].gatewaycheck=@"NO";
-        }else
-        {
-            [vminfo share].gatewaycheck=@"YES";
-        }
-        //加载网页
-        //[self loadMyWebview];
-    }
-    
-    NSString *msg = [innerNet isEqualToString:@"1"] ? @"内网" : @"外网";
-    NSLog(@"当前连接的cu是:%@环境", msg);
-}
-
 #pragma mark sendMessageToDocker
 /*******************
  
  **function:将docker的信息封装，发送给服务器。
  
  *******************/
-
 -(void)sendMessageToDocker
 {
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/sendMessageToDockerManager",_connectInfo.cuIp];
@@ -515,7 +432,7 @@
         }
         _isNotFirstLoad = YES;
     }
-    NSLog(@"_isNotFirstLoad:%i", _isNotFirstLoad);
+    NSLog(@"加载拦截时的_isNotFirstLoad:%i", _isNotFirstLoad);
     return YES;
 }
 
@@ -686,8 +603,7 @@
 -(BOOL)MD5check
 {
     
-    NSString *filepath= [[NSBundle mainBundle] pathForResource:@"ipconfig" ofType:@"html" inDirectory:@"ipconfig"];
-    NSLog(@"%@",filepath);
+    NSString *filepath= [[NSBundle mainBundle] pathForResource:@"testhe" ofType:@"html" inDirectory:@"iplogin"];
     NSString *resultMD5=[self fileMD5:filepath];
     if ([resultMD5 isEqualToString:LOCALMD5]) {
         return YES;

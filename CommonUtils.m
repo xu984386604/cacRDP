@@ -123,7 +123,6 @@ bool IsInner(unsigned int userIp, unsigned int begin, unsigned int end)
     //设置字体样式
     //UIFont *font = [UIFont fontWithName:@"Arial-BoldItalicMT" size:32];
     UIFont *font = [UIFont fontWithName:kFontAwesomeFamilyName size:fontSize];
-    NSLog(@"字体有：%@", [UIFont familyNames]);
     color = color ? color : [UIColor redColor];//默认为红色字体
     NSDictionary *dict = @{NSFontAttributeName:font,NSForegroundColorAttributeName:color};
     CGSize textSize = [text sizeWithAttributes:dict];
