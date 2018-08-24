@@ -263,7 +263,7 @@ out_free:
 	[self performSelectorInBackground:@selector(runSession) withObject:nil];
 }
 
-- (void)disconnect
+- (void) disconnect
 {
 	mfInfo* mfi = [self mfi];
 	

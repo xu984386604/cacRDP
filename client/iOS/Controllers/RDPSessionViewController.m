@@ -362,6 +362,11 @@
                                             repeats:NO];
 
     
+    //加载一张图片
+    _connectingBackgroundView = [[UIImageView alloc]initWithImage: [UIImage imageNamed:@"Default"]];
+    _connectingBackgroundView.frame = CGRectMake(0, 0, [self view].frame.size.width, [self view].frame.size.height);
+    [[self view] addSubview:_connectingBackgroundView];
+    
     // load connecting view
     [[NSBundle mainBundle] loadNibNamed:@"RDPConnectingView" owner:self options:nil];
     
@@ -375,8 +380,6 @@
 
     // display connecting view and start indicator
     [[self view] addSubview:_connecting_view];
-    UIColor *bgColor = [UIColor colorWithPatternImage: [UIImage imageNamed:@"Default-Landscape@2x~ipad"]];
-    [[self view] setBackgroundColor:bgColor];
 
     [_connecting_indicator_view startAnimating];
 }
@@ -460,8 +463,10 @@
     // remove and release connecting view
     [_connecting_indicator_view stopAnimating];
     [_connecting_view removeFromSuperview];
+    [_connectingBackgroundView removeFromSuperview];
     [[self view] setBackgroundColor:nil];
-    [_connecting_view autorelease];   
+    [_connecting_view autorelease];
+    [_connectingBackgroundView autorelease];
     
     // check if session settings changed ...
     // The 2nd width check is to ignore changes in resolution settings due to the RDVH display bug (refer to RDPSEssion.m for more details)
@@ -918,6 +923,9 @@
         [timer invalidate]; //关闭计时器。。。
     [_session disconnect];
 }
+
+
+
 
 #pragma mark -
 #pragma mark iOS Keyboard Notification Handlers
