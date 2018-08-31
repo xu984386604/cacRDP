@@ -568,7 +568,6 @@
     CGFloat myfloat = SCREEN_HEIGHT  / 3;  //宽度的1/3
     if (temp.y - myfloat > 0) {
         temp.y = SCREEN_HEIGHT / 3 ;
-        NSLog(@"%f",SCREEN_HEIGHT);
         [UIView animateWithDuration:0.2 animations:^{
             [_myfloatbutton setCenter:temp];
         }];
@@ -591,6 +590,15 @@
     [self performSelector:@selector(closeOpenRdp) withObject:nil];
     //[self closeOpenRdp];
     
+    //隐藏menu
+    if(ISShowMenuButton)
+    {
+        [UIView animateWithDuration:0.2 animations:^{
+            [_mymenuview dismiss];
+        }];
+
+    }
+
     [self dismissViewControllerAnimated:YES completion:NULL];
     
 }
