@@ -5,7 +5,7 @@ body{
     opacity: 0;
 }
 .loginbox button{
-    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 .y-box-wrap{
     margin: 2rem 0;
@@ -39,6 +39,12 @@ body{
 }
 .y-login-btn{
     background-color: #e91e63;
+}
+#login{
+    outline: none;
+}
+.y-link a{
+    color: #fff;
 }
 
 /* 多选框样式 */

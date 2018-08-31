@@ -11,11 +11,12 @@
 #import "Toast+UIView.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "FontAwesome/NSString+FontAwesome.h"
+#import "UpdateApp/UpdateApp.h"
 
 
 #define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
 #define SCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
-#define LOCALMD5      @"af534b6a413b2394ec682f47cabdaae6"
+#define LOCALMD5      @"2459baf34798cf85e925870f59b87943"
 
 
 
@@ -28,16 +29,20 @@
 
 @implementation CuWebViewController
 - (void)viewDidLoad {
+    //检查一波版本
+    [[[UpdateApp alloc] init] checkVersionUpdata];
+    
     [super viewDidLoad];
     innerNet=@"1"; //默认外网
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
     BOOL md5check=[self MD5check];
-    if(!md5check)
+    if(md5check)
     {
         [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
     }
-   
+    //[self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
+    
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stoppostMessageToservice:) name:@"stoppostMessageToservice" object:nil];
@@ -64,15 +69,7 @@
     myWebView.delegate=self;
     [myWebView loadRequest:myrequest];
     [self.view addSubview:myWebView];
-    //NSString *htmlString = [[[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName]  encoding:NSUTF8StringEncoding error:nil] autorelease];
-    //myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    //[myWebView loadHTMLString:htmlString baseURL:[NSURL fileURLWithPath:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:dirName]]];
-    //myWebView.delegate=self;
-    //[self.view addSubview:myWebView];
-   // if (_isNotFirstLoad) {
-    //    NSLog(@"_isNotFirstLoad");
-   // }
-    _isNotFirstLoad = YES;
+    //_isNotFirstLoad = YES;
 }
 
 //加载本地网页
@@ -95,7 +92,7 @@
     NSString *filename = [[notification userInfo] objectForKey:@"filename"];
     NSString *dirName = [[notification userInfo] objectForKey:@"dirname"];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"html" inDirectory:dirName];
-    filePath = [NSString stringWithFormat:@"%@?isAutoLogin=0", filePath]; //0代表 点注销跳回登录页面
+    filePath = [NSString stringWithFormat:@"%@?isAutoLogin=0", filePath]; //0代表注销跳回登录页面
     NSLog(@"notice-filepath：%@",filePath);
     NSURL *url = [NSURL URLWithString:filePath];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -175,8 +172,6 @@
     //[vminfo filterRecoverRdpinfoDic];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"recoverMsg"];
-    
-    //[self clearCookies];
 }
 
 #pragma mark initJsContext
@@ -209,7 +204,6 @@
         NSLog(@"生成uuid");
     }
     else{
-    
         NSLog(@"不是第一次启动");
     }
 }
@@ -220,13 +214,13 @@
 {
     NSString* obj = (NSString*)[notification object];//获取到传递的对象
     
-    if ([obj isEqualToString:@"loginMsg"]) {
-        [self sendMessage: @"loginMsg"];
-        //每个120s发送一次
-        if (!_mytimer) {
-            _mytimer = [NSTimer scheduledTimerWithTimeInterval:120.0 target:self selector:@selector(sendTimerMessage:) userInfo:@{@"smsType":@"loginMsg"} repeats:YES];
-        }
-    }
+//    if ([obj isEqualToString:@"loginMsg"]) {
+//        [self sendMessage: @"loginMsg"];
+//        //每个120s发送一次
+//        if (!_mytimer) {
+//            _mytimer = [NSTimer scheduledTimerWithTimeInterval:120.0 target:self selector:@selector(sendTimerMessage:) userInfo:@{@"smsType":@"loginMsg"} repeats:YES];
+//        }
+//    }
     if ([obj isEqualToString:@"recoverMsg"]) {
         [self sendMessage: @"recoverMsg"];
         //每个300s发送一次
@@ -236,7 +230,7 @@
     }
 }
 
-//停止发送消息,单点登录的信息在用户注销的时候执行
+//停止向cu发送消息
 -(void)stoppostMessageToservice:(NSNotification*) notification
 {
     NSString* smsType = (NSString*)[notification object];//获取到传递的对象
@@ -244,10 +238,10 @@
         [[vminfo share].recoverTimer invalidate];
         [vminfo share].recoverTimer  = nil;
     }
-    if ([smsType  isEqual: @"recoverMsg"]) {
-        [_mytimer invalidate];
-        _mytimer = nil;
-    }
+    //if ([smsType  isEqual: @"loginMsg"]) {
+    //    [_mytimer invalidate];
+    //    _mytimer = nil;
+    //}
     NSLog(@"停止发送%@信息!", smsType);
 }
 
@@ -372,16 +366,15 @@
     myrequest.HTTPBody=data;
     
     [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
-    
 }
 
 
 #pragma mark -
 #pragma mark 支付宝相关方法
-
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     NSURL *reqUrl = request.URL;
     NSString* urlStr =[reqUrl.absoluteString stringByRemovingPercentEncoding];
+    //NSLog(@"访问的url:%@", urlStr);
     //支付宝进入支付环节经历的网址跳转的8个步骤
     //1. https://openapi.alipay.com/gateway.do?charset=UTF-8
     //2. https://unitradeprod.alipay.com/appAssign.htm?alipay_exterface_invoke_assign_target=invoke_f92939685a8a14b982d324a9bc1f6e1e&alipay_exterface_invoke_assign_sign=e_al9k8_jk4r7_pxonth_t0_be_j_m_hvjci_o_gcq_i7_s_e_npm_a_v6er_s47h_vd_t7_iw%3D%3D
@@ -432,7 +425,6 @@
         }
         _isNotFirstLoad = YES;
     }
-    NSLog(@"加载拦截时的_isNotFirstLoad:%i", _isNotFirstLoad);
     return YES;
 }
 
@@ -449,22 +441,6 @@
     }
 }
 
-- (void) checkCookies {
-    NSLog(@"开始打印cookie");
-    NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    for (NSHTTPCookie *cookie in [storage cookies]){
-        NSLog(@"cookie:%@", cookie);
-    }
-}
-
-- (void) clearCookies {
-    NSLog(@"开始删除cookie");
-    NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    for (NSHTTPCookie *cookie in [storage cookies]){
-        [storage deleteCookie:cookie];
-    }
-}
-
 //屏幕支持的方向
 
 /*-(UIInterfaceOrientationMask)supportedInterfaceOrientations{
@@ -476,14 +452,16 @@
     [[self view] makeToast:NSLocalizedString(@"马上返回cu界面", @"come back to cu interface") duration:2.0 position:@"center"];  //ToastDurationShort
     NSString *cuurl=[NSString stringWithFormat:@"%@/cu",[vminfo share].cuIp];
     NSURLRequest *myrequest=[NSURLRequest requestWithURL:[NSURL URLWithString:cuurl]];
-    [self performSelector:@selector(loadCuPage:) withObject:myrequest afterDelay:2.0f];
+    [self performSelector:@selector(loadCuPage:) withObject:myrequest afterDelay:1.0f];
     
-    _isNotFirstLoad = YES;
+    //_isNotFirstLoad = YES;
 }
-
+//支付宝返回cu界面
 -(void) loadCuPage:(NSURLRequest*) myrequest {
     [UIView animateWithDuration:1.0f animations:^{
         [myWebView removeFromSuperview];
+        myWebView = nil;
+        [myWebView autorelease];
         myWebView = [[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
         [self.view addSubview:myWebView];
         myWebView.delegate = self;
@@ -518,17 +496,6 @@
     }
 }
 
-
--(void)setFlag:(NSNotification *)notification {
-    NSString* obj = (NSString*)[notification object];
-    if ([obj isEqualToString:@"0"]) {
-        [myWebView stringByEvaluatingJavaScriptFromString:@"insertIntoLocal('0');"];
-    } else {
-        [myWebView stringByEvaluatingJavaScriptFromString:@"insertIntoLocal('1');"];
-    }
-    
-}
-
 #pragma mark 屏幕旋转
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
@@ -545,8 +512,6 @@
     }];
     
     [UIView commitAnimations];
-
-   
 }
 
 #pragma mark 进入后台
@@ -558,8 +523,8 @@
     [UIView setAnimationDidStopSelector:@selector(animationFinished:finished:contex:)];
     self.view.window.bounds = CGRectMake(0, 0, 0, 0);
     [UIView commitAnimations];
-    
 }
+
 
 -(void)animationFinished:(NSString *)animationID finished:(NSNumber *)finished contex:(void *)context{
     if([animationID compare:@"exitApplication"] == 0)
@@ -578,7 +543,6 @@
     CC_MD5_Init(&md5);
     BOOL done = NO;
     while (!done) {
-        
         NSData * fileData = [handle readDataOfLength:256];
         CC_MD5_Update(&md5, [fileData bytes], [fileData length]);
         if( [fileData length] == 0 ) done = YES;
@@ -605,6 +569,7 @@
     
     NSString *filepath= [[NSBundle mainBundle] pathForResource:@"testhe" ofType:@"html" inDirectory:@"iplogin"];
     NSString *resultMD5=[self fileMD5:filepath];
+    NSLog(@"resultMD5:%@", resultMD5);
     if ([resultMD5 isEqualToString:LOCALMD5]) {
         return YES;
     }else
@@ -624,14 +589,11 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self presentViewController:myalert animated:YES completion:nil];
     });
-
-    
-    
 }
+
 //传入的参数错误，提示错误信息
 -(void)showParamErrorMessage
 {
-
     UIAlertController * myalert = [UIAlertController alertControllerWithTitle:@"错误提示" message:@"参数错误，无法打开" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction * defaultaction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil];
     
@@ -639,7 +601,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self presentViewController:myalert animated:YES completion:nil];
     });
-
 }
 
 @end

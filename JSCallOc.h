@@ -21,7 +21,6 @@
 -(void)AcceptUidAndKeepHeartBeat:(NSString *)data;
 -(void)StopHeartBeat:(id)num;
 -(void)getCUAddress:(NSString *)ipUrl;
--(void)openIpConfig:(NSString *)data;
--(void)setFlag:(NSString *)data;
+//-(void)openIpConfig:(NSString *)data;
 -(void)appEnterBackground:(id)num;  //程序退出
 @end

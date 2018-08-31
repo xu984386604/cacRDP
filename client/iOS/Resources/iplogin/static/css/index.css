@@ -39,7 +39,7 @@ body{
     overflow: hidden;
 }
 .ipwrap{
-    margin-top: 6rem;
+    margin-top: 2rem;
 }
 .iconfont{
     color: #fff;
@@ -133,7 +133,7 @@ body{
 }
 .y-btn-wrap{
     text-align: center;
-    margin-top: 2rem;
+    /* margin-top: 2rem; */
 }
 .y-btn{
     display: inline-block;
@@ -160,7 +160,7 @@ body{
     background-color: #9bbeda;
     outline: none;
     color: #fff;
-    margin-top: 3rem;
+    /* margin-top: 3rem; */
 }
 .bugtip{
         color: red;

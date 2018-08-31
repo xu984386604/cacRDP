@@ -122,13 +122,13 @@
     //解析出了uid，通过vminfo共享数据
     [vminfo share].uid=uid;
     //发送通知，向服务器发送消息
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"loginMsg"];
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"loginMsg"];
 
 }
 //注销的时候，停止发送心跳
 -(void)StopHeartBeat:(id)num
 {
-     [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"loginMsg"];
+     //[[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"loginMsg"];
     //注销后返回到iplogin界面
     NSDictionary *dic = @{@"filename":@"testhe",
                           @"dirname":@"iplogin"
@@ -142,10 +142,10 @@
     NSError * err;
     NSDictionary *mydic=[NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
     NSString *url=[mydic objectForKey:@"url"];
-    [vminfo share].cuIp = url;
+    [vminfo share].cuIp = [NSString stringWithFormat:@"http://%@", url];
     NSLog(@"收到的ipurl:%@", url);
     
-    //默认处理这种格式的字符串“http://google.com/”
+    //默认处理这种格式的字符串“http://google.com/”(可以带端口号)
     NSMutableString *mUrl = [NSMutableString stringWithString:url];
     if ([mUrl containsString:@"http://"]) {
         [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"http://"]];
@@ -172,24 +172,14 @@
 }
 
 
--(void)openIpConfig:(NSString *)data {
-    NSDictionary *dic = @{@"filename":@"testhe",
-                          @"dirname":@"iplogin"
-                          };
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"loadLocalHTML" object:nil userInfo:dic];
-}
+//-(void)openIpConfig:(NSString *)data {
+//    NSDictionary *dic = @{@"filename":@"testhe",
+//                          @"dirname":@"iplogin"
+//                          };
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"loadLocalHTML" object:nil userInfo:dic];
+//}
 
--(void)setFlag:(NSString *)data {
-    NSLog(@"[vminfo share].count:%i", [vminfo share].count);
-    [vminfo share].count ++;
-    if ([vminfo share].count == 1) {
-        //设置为0
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"setFlag" object:@"0" userInfo:nil];
-    } else {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"setFlag" object:@"1" userInfo:nil];
-    }
-    
-}
+
 -(void)appEnterBackground:(id)num
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"appEnterbackGround" object:nil];

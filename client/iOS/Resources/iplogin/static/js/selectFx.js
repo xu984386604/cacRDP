@@ -280,9 +280,9 @@
 
 		// update current selected value
 		this.selPlaceholder.textContent = opt.textContent;
-		console.log('opt.dataset.ipaddress')
-		console.log(opt)
 		this.selPlaceholder.dataset.ipaddress = opt.dataset.ipaddress;
+		//设置用户上次选择的缓存
+		localStorage.setItem('lastipaddress',opt.dataset.ipaddress);
 
 		// change native select element´s value
 		this.el.value = opt.getAttribute( 'data-value' );
