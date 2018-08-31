@@ -129,6 +129,11 @@
 -(void)StopHeartBeat:(id)num
 {
      [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"loginMsg"];
+    //注销后返回到iplogin界面
+    NSDictionary *dic = @{@"filename":@"testhe",
+                          @"dirname":@"iplogin"
+                          };
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"loadLocalHTML" object:nil userInfo:dic];
 }
 
 //获取cu地址
@@ -168,8 +173,8 @@
 
 
 -(void)openIpConfig:(NSString *)data {
-    NSDictionary *dic = @{@"filename":@"ipconfig",
-                          @"dirname":@"ipconfig"
+    NSDictionary *dic = @{@"filename":@"testhe",
+                          @"dirname":@"iplogin"
                           };
     [[NSNotificationCenter defaultCenter] postNotificationName:@"loadLocalHTML" object:nil userInfo:dic];
 }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登录</title>
+    <link rel="stylesheet" href="./static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./static/css/animate.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/login.css" />
+</head>
+<body style="background:transparent;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-10 col-xs-12 loginbox">
+                <div class="y-box-wrap">
+                    <input type="text" class="form-control" id="username" placeholder="用户名">
+                </div>
+                <div class="y-box-wrap">
+                    <input type="password" class="form-control" id="password" placeholder="密码">
+                </div>
+                <div class="y-box-wrap">
+                    <div class="linkbox pull-right">
+                        <label class="ant-checkbox-wrapper">
+                            <span class="ant-checkbox">
+                                <input type="checkbox" class="ant-checkbox-input" value="">
+                                <span class="ant-checkbox-inner"></span>
+                            </span>
+                            <span class="y-link">自动登录</span>
+                        </label>
+                        <span class="y-link regist"><a href="http://172.20.156.168/cu/Public/vue/build/index.php#/reset-password">注册</a>|</span>
+                        <span class="y-link reset-password"><a href="http://172.20.156.168/cu/Public/vue/build/index.php#/reset-password">忘记密码</a></span>
+                    </div>
+                </div>
+                <div class="y-box-wrap">
+                    <button class="btn col-xs-12 btn-primary" id="login">登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    //  $(".y-form-control").focus(function(){
+    //     $(this).prev(".y-lable-input").removeClass('animated fadeOutDown');
+    //     $(this).prev(".y-lable-input").addClass('animated fadeInUp');
+
+    // })
+    // $(".y-form-control").focusout(function(){
+    //     $(this).prev(".y-lable-input").removeClass('animated fadeInUp');
+    //     $(this).prev(".y-lable-input").addClass('animated fadeOutDown');
+    // })
+    $('.ant-checkbox-wrapper').click(function(){
+        $(this).toggleClass('ant-checkbox-checked');
+    })
+
+</script>
+</html>
