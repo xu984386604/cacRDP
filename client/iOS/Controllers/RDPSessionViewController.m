@@ -547,10 +547,10 @@
             [self toggleTouchPointer:nil];
             break;
         case 3:
-            [self postData:NO];
+            [self postData:YES];
             break;
         case 4:
-            [self postData:YES];
+            [self postData:NO];
             break;
         case 5:
             [self disconnectSession:nil];
@@ -756,32 +756,37 @@
     NSString *ip=myinfo.cuIp;
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/loadNetDisk",ip];
     NSURL *url=[NSURL URLWithString:Reset_vm_User];
-    NSLog(@"%@",Reset_vm_User);
     NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
     myrequest.HTTPMethod=@"POST";
     [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
     NSMutableDictionary *dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                              myinfo.vmip,@"AppIp",
+                              myinfo.vmip,@"AppIP",
                               myinfo.vmpasswd,@"vmpasswd",
                               myinfo.vmusername,@"vmusername",
-                              @"0",@"isFirst",nil];
+                              @"0",@"isFirst",
+                              nil];
     
-    if(flag) //卸载网盘
+    //挂载网盘
+    
+    if(!flag) //卸载网盘
+    {
         [dic setValue:@"-1" forKey:@"uid"];
-    else    //挂载网盘
+    }
+    else
+    {//挂载网盘
         [dic setValue:myinfo.uid forKey:@"uid"];
+    }
+
     NSLog(@"%@",dic);
     NSData *data=[NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
     myrequest.HTTPBody=data;
     
-  //  [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
-    NSURLSession *mysession = [NSURLSession sharedSession];
-    [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-    }];
+    [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
 
     
+    
+
     
 }
 
@@ -808,11 +813,7 @@
     NSData *data=[NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
     myrequest.HTTPBody=data;
     
-  //  [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
-    NSURLSession *mysession = [NSURLSession sharedSession];
-    [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-    }];
+  [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
 
 
 }

@@ -1,6 +1,11 @@
 setWinAapp();
 //先检测是否要自动登录
 let jumpfrom = GetQueryString('isAutoLogin');
+let canClearCookie = GetQueryString('canClearCookie');
+if(canClearCookie == '1'){
+    localStorage.setItem('autologin','false');
+    localStorage.removeItem('enpw');
+}
 if(jumpfrom !== '0'){
     let autologin = localStorage.getItem('autologin');
     if(autologin == 'true'){
@@ -23,7 +28,11 @@ if(jumpfrom !== '0'){
         })
         .then(function(res){
             if(res.code == 800){
-            setCUAddress(ipstr);
+            let sendData = {
+                userID:res.data.userID,
+                operation : 'setUserId'
+            }
+            executeByTerminal(sendData);
             window.location.href = locationurl+res.data.code;  
             }else{
 
@@ -74,6 +83,14 @@ if(jumpfrom !== '0'){
                     }
                     //
                     $('#username').val(localStorage.getItem('user'));
+                    //
+                    localStorage.setItem('lastipaddress',ipstr);
+                    //连接时发送ip地址
+                    let sendData = {
+                        url:ipstr,
+                        operation : 'setIp'
+                    }
+                    executeByTerminal(sendData);
                     //点击登录按钮
                     $('#login').click(function(){
                         //获取用户的输入
@@ -108,14 +125,18 @@ if(jumpfrom !== '0'){
                                 localStorage.setItem('user',username);
                                 localStorage.setItem('enpw',encryptedPassword);
                                 //进行地址跳转
-                               setCUAddress(ipstr);
+                                let sendData = {
+                                    userID:res.data.userID,
+                                    operation : 'setUserId'
+                                }
+                                executeByTerminal(sendData);
                                 window.location.href = locationurl+res.data.code; 
                             }else{
                                 errorconsole($('.loginbox'),CODE_MSG(res.code));
                             }
                         },function(err, status){
                             if(status=='timeout'){//超时,status还有success,error等值的情况
-                                errorconsole($('.loginbox'),'登录超时110');
+                                errorconsole($('.loginbox'),'登录超时'); 
                             }else if(status=='error'){
                                 errorconsole($('.loginbox'),'登录失败'); 
                             }
@@ -192,7 +213,14 @@ if(jumpfrom !== '0'){
                     if($('.collapse').hasClass('in')){
                         $('.collapse').removeClass('in');
                     }
+                    localStorage.setItem('lastipaddress',ipstr);
                     $('#username').val(localStorage.getItem('user'));
+                    //连接时发送ip地址
+                    let sendData = {
+                        url:ipstr,
+                        operation : 'setIp'
+                    }
+                    executeByTerminal(sendData);
                     //点击登录按钮
                     $('#login').click(function(){
                         //获取用户的输入
@@ -226,8 +254,12 @@ if(jumpfrom !== '0'){
                                 //存localstorage为自动登录做准备
                                 localStorage.setItem('user',username);
                                 localStorage.setItem('enpw',encryptedPassword);
-                                //进行地址跳转
-                                setCUAddress(ipstr);
+                                //登录 进行地址跳转
+                                let sendData = {
+                                    userID:res.data.userID,
+                                    operation : 'setUserId'
+                                }
+                                executeByTerminal(sendData);
                                 window.location.href = locationurl+res.data.code; 
                             }else{
                                 errorconsole($('.loginbox'),CODE_MSG(res.code));
@@ -335,9 +367,10 @@ function isValidinput(data){
 }
 
 //与客户端通信，向客户端发送当前打开的ip地址
-function setCUAddress(ipurl){
-    window.app.setCUAddress(JSON.stringify({url:ipurl}))
+function executeByTerminal(sendData){
+    window.app.executeByTerminal(JSON.stringify(sendData));
 };
+
 
 //与安卓端通信，确定页面跳转方向
 function getjumpfrom(){

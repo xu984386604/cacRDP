@@ -35,9 +35,7 @@
     myinfo.vmpasswd=[_dic objectForKey:@"vmpsswd"];
     myinfo.vmusername=[_dic objectForKey:@"vmusername"];
     NSString* remoteProgram=[_dic objectForKey:@"remoteProgram"];
-    myinfo.appid = [_dic objectForKey:@"id"];
-       [vminfo share].uid = @"1";
-    
+    myinfo.appid = [_dic objectForKey:@"id"];    
      //docker应用处理
     NSString *apptype=[_dic objectForKey:@"appType"];
     if([apptype isEqualToString:@"lca"])
@@ -116,10 +114,50 @@
     NSDictionary *mydic=[NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
     
     NSAssert(mydic!=nil, @"数据为空，解析uid失败!");
-    NSString *uid=[mydic objectForKey:@"userid"];
     
-    //解析出了uid，通过vminfo共享数据
-    [vminfo share].uid=uid;
+    NSString *operation=[mydic objectForKey:@"operation"];
+    
+    if([operation isEqualToString:@"setIp"])
+    {
+
+        NSString * url = [mydic objectForKey:@"url"];
+        [vminfo share].cuIp = [NSString stringWithFormat:@"http://%@/", url];
+        //默认处理这种格式的字符串“http://google.com/”(可以带端口号)
+        NSMutableString *mUrl = [NSMutableString stringWithString:url];
+        if ([mUrl containsString:@"http://"]) {
+            [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"http://"]];
+        }
+        if ([mUrl containsString:@"https://"]) {
+            [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"https://"]];
+        }
+        if ([mUrl containsString:@"/"]) {
+            [mUrl deleteCharactersInRange:[mUrl rangeOfString:@"/"]];
+        }
+        
+        int isInnerIP = [CommonUtils isInnerIP:mUrl];
+        //-1代表错误，1代表外网，0代表内网
+        if(isInnerIP == -1) {
+            NSLog(@"无法判断内外网！凉凉..........");
+        } else if(isInnerIP == 0) {
+            [vminfo share].gatewaycheck = @"NO";
+            NSLog(@"是内网！");
+        } else if(isInnerIP == 1) {
+            [vminfo share].gatewaycheck = @"YES";
+            NSLog(@"是外网！");
+        }
+
+        
+        
+    }
+    if([operation isEqualToString:@"setUserId"])
+    {
+        //解析出了uid，通过vminfo共享数据
+        NSString *uid=[mydic objectForKey:@"userID"];
+        [vminfo share].uid=uid;
+    }
+
+    
+    
     //发送通知，向服务器发送消息
     //[[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"loginMsg"];
 
@@ -164,7 +202,7 @@
         [vminfo share].gatewaycheck = @"NO";
         NSLog(@"是内网！");
     } else if(isInnerIP == 1) {
-        [vminfo share].gatewaycheck = @"NO";
+        [vminfo share].gatewaycheck = @"YES";
         NSLog(@"是外网！");
     }
 }
