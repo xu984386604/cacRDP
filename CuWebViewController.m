@@ -16,7 +16,7 @@
 
 #define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
 #define SCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
-#define LOCALMD5      @"2459baf34798cf85e925870f59b87943"
+#define LOCALMD5      @"0aa3ce70e4bd6871465b371144ba8c35"
 
 
 
@@ -37,11 +37,11 @@
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
     BOOL md5check=[self MD5check];
-    if(md5check)
-    {
-        [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
-    }
-    //[self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
+    //if(md5check)
+    //{
+    //    [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
+    //}
+    [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
     
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];

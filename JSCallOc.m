@@ -142,9 +142,9 @@
     NSError * err;
     NSDictionary *mydic=[NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
     NSString *url=[mydic objectForKey:@"url"];
-    [vminfo share].cuIp = [NSString stringWithFormat:@"http://%@", url];
+    [vminfo share].cuIp = [NSString stringWithFormat:@"http://%@/", url];
     NSLog(@"收到的ipurl:%@", url);
-    
+
     //默认处理这种格式的字符串“http://google.com/”(可以带端口号)
     NSMutableString *mUrl = [NSMutableString stringWithString:url];
     if ([mUrl containsString:@"http://"]) {
@@ -161,7 +161,6 @@
     //-1代表错误，1代表外网，0代表内网
     if(isInnerIP == -1) {
         NSLog(@"无法判断内外网！凉凉..........");
-        //[vminfo share].gatewaycheck = @"YES";
     } else if(isInnerIP == 0) {
         [vminfo share].gatewaycheck = @"NO";
         NSLog(@"是内网！");
@@ -171,21 +170,9 @@
     }
 }
 
-
-//-(void)openIpConfig:(NSString *)data {
-//    NSDictionary *dic = @{@"filename":@"testhe",
-//                          @"dirname":@"iplogin"
-//                          };
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"loadLocalHTML" object:nil userInfo:dic];
-//}
-
-
 -(void)appEnterBackground:(id)num
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"appEnterbackGround" object:nil];
-    
 }
-
-
 
 @end
