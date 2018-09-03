@@ -38,7 +38,7 @@
     myinfo.vmusername=[_dic objectForKey:@"vmusername"];
     NSString* remoteProgram=[_dic objectForKey:@"remoteProgram"];
     myinfo.appid = [_dic objectForKey:@"id"];
-    myinfo.uid = [_dic objectForKey:@"username"];
+       [vminfo share].uid = @"1";
     
      //docker应用处理
     NSString *apptype=[_dic objectForKey:@"appType"];
@@ -116,6 +116,7 @@
     NSData *str=[data dataUsingEncoding:NSUTF8StringEncoding];
     NSError * err;
     NSDictionary *mydic=[NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
+    
     NSAssert(mydic!=nil, @"数据为空，解析uid失败!");
     NSString *uid=[mydic objectForKey:@"userid"];
     
@@ -165,7 +166,7 @@
         [vminfo share].gatewaycheck = @"NO";
         NSLog(@"是内网！");
     } else if(isInnerIP == 1) {
-        [vminfo share].gatewaycheck = @"YES";
+        [vminfo share].gatewaycheck = @"NO";
         NSLog(@"是外网！");
     }
 }

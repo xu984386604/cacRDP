@@ -756,12 +756,13 @@
     NSString *ip=myinfo.cuIp;
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/loadNetDisk",ip];
     NSURL *url=[NSURL URLWithString:Reset_vm_User];
+    NSLog(@"%@",Reset_vm_User);
     NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
     myrequest.HTTPMethod=@"POST";
     [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
     NSMutableDictionary *dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                              myinfo.vmip,@"AppIP",
+                              myinfo.vmip,@"AppIp",
                               myinfo.vmpasswd,@"vmpasswd",
                               myinfo.vmusername,@"vmusername",
                               @"0",@"isFirst",nil];
@@ -774,7 +775,7 @@
     NSData *data=[NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
     myrequest.HTTPBody=data;
     
-   // [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+  //  [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
     NSURLSession *mysession = [NSURLSession sharedSession];
     [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
@@ -802,7 +803,7 @@
                               nil];
     
     //挂载网盘
-        [dic setValue:myinfo.uid forKey:@"uid"];
+    [dic setValue:myinfo.uid forKey:@"uid"];
     NSLog(@"%@",dic);
     NSData *data=[NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
     myrequest.HTTPBody=data;
