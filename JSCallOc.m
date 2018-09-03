@@ -11,10 +11,8 @@
 @implementation JSCallOc
 
 /*****************************
- 
  **parameter：json数据
  **function：解析并且保存json数据
- 
  *****************************/
 -(void)AcceptTheDataFromJs:(NSString *)data
 {
