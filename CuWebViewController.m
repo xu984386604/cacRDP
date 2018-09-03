@@ -31,7 +31,6 @@
 - (void)viewDidLoad {
     //检查一波版本
     [[[UpdateApp alloc] init] checkVersionUpdata];
-    
     [super viewDidLoad];
     innerNet=@"1"; //默认外网
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
@@ -42,6 +41,8 @@
     //    [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
     //}
     [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
+    
+    
     
     //注册观察者处理事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openRdp) name:@"openRdp" object:nil];
@@ -76,7 +77,9 @@
 -(void) loadLocalHTML:(NSString*) fileName  inDirectory:(NSString*) dirName{
     myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     myWebView.delegate=self;
+    
 
+    
     NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"html" inDirectory:dirName];
     filePath = [NSString stringWithFormat:@"%@?isAutoLogin=1", filePath]; //1代表应用第一次打开登录页面
     NSLog(@"local_filepath：%@",filePath);

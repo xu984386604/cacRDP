@@ -774,7 +774,12 @@
     NSData *data=[NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
     myrequest.HTTPBody=data;
     
-    [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+   // [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+    NSURLSession *mysession = [NSURLSession sharedSession];
+    [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+    }];
+
     
     
 }
@@ -802,7 +807,12 @@
     NSData *data=[NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
     myrequest.HTTPBody=data;
     
-    [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+  //  [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+    NSURLSession *mysession = [NSURLSession sharedSession];
+    [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+    }];
+
 
 }
 
