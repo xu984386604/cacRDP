@@ -11,10 +11,8 @@
 @implementation JSCallOc
 
 /*****************************
- 
  **parameter：json数据
  **function：解析并且保存json数据
- 
  *****************************/
 -(void)AcceptTheDataFromJs:(NSString *)data
 {
@@ -145,7 +143,7 @@
     NSString *url=[mydic objectForKey:@"url"];
     [vminfo share].cuIp = [NSString stringWithFormat:@"http://%@/", url];
     NSLog(@"收到的ipurl:%@", url);
-    
+
     //默认处理这种格式的字符串“http://google.com/”(可以带端口号)
     NSMutableString *mUrl = [NSMutableString stringWithString:url];
     if ([mUrl containsString:@"http://"]) {
@@ -171,21 +169,9 @@
     }
 }
 
-
-//-(void)openIpConfig:(NSString *)data {
-//    NSDictionary *dic = @{@"filename":@"testhe",
-//                          @"dirname":@"iplogin"
-//                          };
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"loadLocalHTML" object:nil userInfo:dic];
-//}
-
-
 -(void)appEnterBackground:(id)num
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"appEnterbackGround" object:nil];
-    
 }
-
-
 
 @end
