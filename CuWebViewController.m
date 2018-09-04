@@ -41,7 +41,7 @@
     //    [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
     //}
     [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
-    
+    [self initMyFloatButton];
     
     
     //注册观察者处理事件
@@ -474,6 +474,15 @@
 
 //加载支付宝支付的浮动按钮
 - (void) loadAlipayFloatButton {
+    
+    _myfloatbutton.hidden=NO;
+    [self.view addSubview:_myfloatbutton];
+    
+    
+}
+-(void)initMyFloatButton
+{
+
     if(!_myfloatbutton) {
         _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 60, SCREEN_HEIGHT-176, 46, 46)];
         [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH - 60, SCREEN_HEIGHT - 176);
@@ -482,20 +491,21 @@
         
         UIColor *fontIconColor = [UIColor colorWithRed:210 green:210 blue:210 alpha:0.8];
         NSString *fontIcon = [NSString fontAwesomeIconStringForEnum:FAIconArrowLeft];
-                UIImage *menuPicWithAlpha = [CommonUtils imageByApplyingAlpha:0.8 image:[UIImage imageNamed:@"menu.png"]];
+        UIImage *menuPicWithAlpha = [CommonUtils imageByApplyingAlpha:0.8 image:[UIImage imageNamed:@"menu.png"]];
         
         _myfloatbutton.bannerIV.image= [CommonUtils text:fontIcon addToView:menuPicWithAlpha textColor:fontIconColor textSize:38];
-        
-        [self.view addSubview:_myfloatbutton];
-    }
-}
+        _myfloatbutton.hidden=YES;
+       
 
+    }
+
+}
 //移除支付宝支付的浮动按钮
 - (void) removeAlipayFloatButton {
     if(_myfloatbutton) {
         _myfloatbutton.hidden = YES;
         [self.view willRemoveSubview:_myfloatbutton];
-        _myfloatbutton = nil;
+        
     }
 }
 
@@ -509,10 +519,52 @@
     [UIView setAnimationDuration:0.4];
     [UIView setAnimationDelegate:self];
     [UIView animateWithDuration:0.4 animations:^{
-    
+       
         myWebView.frame = CGRectMake(0, 0,
                                      self.view.frame.size.width, self.view.frame.size.height);
     }];
+    
+    
+    
+    
+    if(_myfloatbutton)
+    {
+        CGPoint m = [vminfo share].mypoint;
+        CGFloat myheight = [UIScreen mainScreen].bounds.size.height;
+        CGFloat mywidth = [UIScreen mainScreen].bounds.size.width;
+        [_myfloatbutton setLimitRange:myheight andWidth:mywidth];
+        float x = m.x;
+        float y = m.y;
+        
+        CGPoint m2 = CGPointZero;
+        
+        
+        if( x < SCREEN_WIDTH / 2)  //left
+        {
+            m2.x = 37 ;
+        }
+        else     //right
+        {
+            m2.x = mywidth - 37;
+        }
+        
+        if( y > myheight)  //超过了
+        {
+            m2.y = myheight - 37;
+        }
+        else
+        {
+            m2.y = y;
+        }
+        
+        
+        [UIView animateWithDuration:0.4 animations:^{
+
+            [_myfloatbutton setCenter:m2];
+            [vminfo share].mypoint = m2;
+                    }];
+        
+    }
     
     [UIView commitAnimations];
 }
