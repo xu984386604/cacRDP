@@ -27,5 +27,5 @@
 @property (nonatomic, assign) BOOL isMoving;//是否可移动
 
 
-
+-(void)setLimitRange:(CGFloat)myHeight andWidth:(CGFloat)myWidth;
 @end

@@ -182,7 +182,7 @@
 {    
     [self sendVirtualKey:VK_LCONTROL up:_ctrl_pressed];
     _ctrl_pressed = !_ctrl_pressed;
-    [self notifyDelegateModifiersChanged];    
+    [self notifyDelegateModifiersChanged];
 }
 
 // toggle alt key, returns true if pressed, otherwise false

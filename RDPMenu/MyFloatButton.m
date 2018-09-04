@@ -160,4 +160,11 @@ float _h; //有效活动高度
      }];
 }
 
+//设置限制的区域
+-(void)setLimitRange:(CGFloat)myHeight andWidth:(CGFloat)myWidth
+{
+    _w = myWidth;
+    _h = myHeight-49;
+}
+
 @end
