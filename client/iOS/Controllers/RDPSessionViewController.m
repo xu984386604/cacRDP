@@ -63,7 +63,7 @@
         _toggle_mouse_button = NO;
         
         _autoscroll_with_touchpointer = [[NSUserDefaults standardUserDefaults] boolForKey:@"ui.auto_scroll_touchpointer"];
-        //确保他不会滚动？
+        //确保他不会滚动
         _is_autoscrolling = NO;
         
         //menu显示状态
@@ -941,8 +941,8 @@
 
 -(IBAction)cancelButtonPressed:(id)sender
 {
-    if(!is_timeup&&is_closed==NO) //计时器没到时才关闭
-        [timer invalidate]; //关闭计时器。。。
+    if(!is_timeup && is_closed==NO) //计时器没到时才关闭
+        [timer invalidate]; //关闭计时器
     [_session disconnect];
 }
 

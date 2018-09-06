@@ -51,6 +51,22 @@
     return tempTime;
 }
 
+//来自于xxxxxx的时间提醒：yyyy年MM月dd日 HH小时mm分ss秒
++ (NSString *)  currentStandardFormatDate:(NSString *) info  {
+    // 获取系统当前时间
+    NSDate *date = [NSDate date];
+    NSTimeInterval sec = [date timeIntervalSinceNow];
+    NSDate *currentDate = [[NSDate alloc] initWithTimeIntervalSinceNow:sec];
+    
+    //设置时间输出格式：
+    NSDateFormatter *df = [[NSDateFormatter alloc] init ];
+    [df setDateFormat:@"yyyy年MM月dd日 HH小时mm分ss秒"];
+    NSString *na = [df stringFromDate:currentDate];
+    na = [NSString stringWithFormat:@"来自于%@的时间提醒：%@", info, na];
+    NSLog(@"系统当前时间为：%@",na);
+    return na;
+}
+
 //判断连接的服务器相对于本机为内网还是外网, -1代表错误，1代表外网，0代表内网
 + (int)isInnerIP:(NSString *)hostName
 {

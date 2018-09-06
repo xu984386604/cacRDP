@@ -16,7 +16,7 @@
 
 #define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
 #define SCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
-#define LOCALMD5      @"0aa3ce70e4bd6871465b371144ba8c35"
+#define LOCALMD5      @"b741b5681e71190588bfe85c742d4e12"
 
 
 
@@ -30,17 +30,25 @@
 @implementation CuWebViewController
 - (void)viewDidLoad {
     //检查一波版本
-    [[[UpdateApp alloc] init] checkVersionUpdata];
+   // [[[UpdateApp alloc] init] checkVersionUpdata];
     [super viewDidLoad];
     innerNet=@"1"; //默认外网
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
     BOOL md5check=[self MD5check];
-    //if(md5check)
-    //{
-    //    [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
-    //}
-    [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
+    if(md5check)
+    {
+        [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
+    }
+    //NSString *str = @"http://ruanyf.github.io/es-checker/index.cn.html";
+    //myWebView = nil;
+    //myWebView = [[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    //[self.view addSubview:myWebView];
+    //myWebView.delegate = self;
+    //NSURLRequest *myrequest = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+    //[myWebView loadRequest:myrequest];
+
+    //[self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
     [self initMyFloatButton];
     
     
@@ -108,6 +116,7 @@
  ********************/
 -(void)openRdp
 {
+    [CommonUtils currentStandardFormatDate:@"openRdp函数第119行"]; //test
     ComputerBookmark *bookmark = [[[ComputerBookmark alloc] initWithBaseDefaultParameters] autorelease];
 
     [[bookmark params] setValue:_connectInfo.remoteProgram  forKey:@"remote_program"];
@@ -124,7 +133,7 @@
         [[bookmark params] setValue:_connectInfo.tsusername forKey:@"tsg_username"];
         [[bookmark params] setValue:_connectInfo.tspwd forKey:@"tsg_password"];
     }
-    //打开的时docker类的应用，要想服务器发送消息
+    //打开的时docker类的应用，要向服务器发送消息
     if([_connectInfo.apptype isEqualToString:@"lca"])
     {
         [self sendMessageToDocker];
@@ -143,18 +152,17 @@
     }
     [[bookmark params] setInt:height*2 forKey:@"width"];
     [[bookmark params] setInt:width*2 forKey:@"height"];
-    
+    [CommonUtils currentStandardFormatDate:@"openRdp函数第155行"]; //test
     NSLog(@"%@",[bookmark params]);
     RDPSession* session = [[[RDPSession alloc] initWithBookmark:bookmark] autorelease];
     RDPSessionViewController* ctrl = [[[RDPSessionViewController alloc] initWithNibName:@"RDPSessionView" bundle:nil session:session] autorelease];
     
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self presentViewController:ctrl animated:YES completion:^{}];
+        [CommonUtils currentStandardFormatDate:@"openRdp函数第162行"]; //test
     });
     
-    NSLog(@"%@:%@:%@:%@", [vminfo share].appid, [vminfo share].vmusername, [vminfo share].vmip, [vminfo share].uid);
-   NSDictionary *jsonData = @{
+    NSDictionary *jsonData = @{
                  @"appid": [vminfo share].appid,
                  @"vmuser": [vminfo share].vmusername,
                  @"userid": [vminfo share].uid,
@@ -482,7 +490,6 @@
 }
 -(void)initMyFloatButton
 {
-
     if(!_myfloatbutton) {
         _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 60, SCREEN_HEIGHT-176, 46, 46)];
         [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH - 60, SCREEN_HEIGHT - 176);
@@ -495,8 +502,6 @@
         
         _myfloatbutton.bannerIV.image= [CommonUtils text:fontIcon addToView:menuPicWithAlpha textColor:fontIconColor textSize:38];
         _myfloatbutton.hidden=YES;
-       
-
     }
 
 }
@@ -505,14 +510,12 @@
     if(_myfloatbutton) {
         _myfloatbutton.hidden = YES;
         [self.view willRemoveSubview:_myfloatbutton];
-        
     }
 }
 
 #pragma mark 屏幕旋转
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    
     CGAffineTransform transform;
     transform = CGAffineTransformRotate(myWebView.transform, M_PI/2.0);
     [UIView beginAnimations:@"roate" context:nil];

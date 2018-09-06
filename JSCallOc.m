@@ -17,6 +17,7 @@
 -(void)AcceptTheDataFromJs:(NSString *)data
 {
     NSLog(@"准备打开应用！");
+    [CommonUtils currentStandardFormatDate:@"AcceptTheDataFromJs函数第20行"]; //test
     NSData *str=[data dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err=nil;
     _dic = [NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
@@ -83,6 +84,7 @@
         [[NSNotificationCenter defaultCenter]
          postNotificationName:@"paramErrorMessage" object:nil];
     }
+    [CommonUtils currentStandardFormatDate:@"AcceptTheDataFromJs函数第87行"]; //test
 }
 
 

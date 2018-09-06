@@ -19,4 +19,5 @@
 + (UIImage*)image:(UIImage*)image addToImage:(UIImage*)bigImage;
 + (UIImage*)convertImageFromeView:(UIView*)view;
 + (UIImage*)imageByApplyingAlpha:(CGFloat) alpha image:(UIImage*) image;
++ (NSString *)  currentStandardFormatDate:(NSString *) info;
 @end
