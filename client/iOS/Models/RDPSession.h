@@ -59,7 +59,7 @@ extern NSString* TSXSessionDidFailToConnectNotification;
     BOOL _suspended;
     
 	// flag that specifies whether the RDP toolbar is visible
-	BOOL _toolbar_visible;  
+	BOOL _toolbar_visible;
 }
 
 @property (readonly) ConnectionParams* params;
@@ -68,7 +68,7 @@ extern NSString* TSXSessionDidFailToConnectNotification;
 @property (assign) BOOL toolbarVisible;
 @property (readonly) CGContextRef bitmapContext;
 @property (readonly) NSCondition* uiRequestCompleted;
-@property (assign, atomic) int isClosed;//是否关闭了
+@property (atomic, assign) BOOL isCancelConnected; //取消按钮是否点击
 
 // initialize a new session with the given bookmark
 - (id)initWithBookmark:(ComputerBookmark*)bookmark;

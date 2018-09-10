@@ -106,9 +106,6 @@ float _h; //有效活动高度
     {
         return;
     }
-    NSLog(@"横坐标:%.2f", movedPT.x);
-    NSLog(@"纵坐标:%.2f", movedPT.y);
-    
     [self setCenter:movedPT];
     
 }

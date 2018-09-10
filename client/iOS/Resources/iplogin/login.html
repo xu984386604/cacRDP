@@ -33,6 +33,7 @@
                         </label>
                         <span class="y-link regist"><a href="#">注册</a> |</span>
                         <span class="y-link reset-password"><a href="#">忘记密码</a></span>
+                        <span class="y-link exit y-hide"><a href="#"> | 退出</a></span>
                     </div>
                 </div>
             </div>
@@ -42,6 +43,11 @@
 <script>
     $('.ant-checkbox-wrapper').click(function(){
         $(this).toggleClass('ant-checkbox-checked');
+    })
+    $(function(){
+        if(navigator.userAgent.indexOf('Windows') !=-1){
+            $('.exit').removeClass('y-hide');
+        }
     })
 </script>
 </html>

@@ -58,7 +58,6 @@ static MenuView *instanceMenuView;
     button2.tag = 2;
      [button2 addTarget:self action:@selector(buttonAction:) forControlEvents:UIControlEventTouchUpInside];
     
-    
     button3 = [MenuButton buttonWithTitle:@"挂载" imageTitle:@"load_netdisk.png" center:point3];
     button3.tag = 3;
      [button3 addTarget:self action:@selector(buttonAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -141,13 +140,13 @@ static MenuView *instanceMenuView;
 
 -(void)buttonAction:(UIButton *)sender
 {
-            /*
-             * menu 消失 发送tag,调用block函数
-             */
-            if(self.clickMenuButton)
-                self.clickMenuButton(sender.tag);
-    
+    /*
+     * menu 消失 发送tag,调用block函数
+     */
+    if(self.clickMenuButton)
+        self.clickMenuButton(sender.tag);
 }
+
 + (instancetype)standardMenuView{
     static dispatch_once_t predicate;
     dispatch_once(&predicate, ^{

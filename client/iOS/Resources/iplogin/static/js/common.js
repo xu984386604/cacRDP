@@ -11,41 +11,6 @@ function encryptPassword(p){
 }
 
 
-    
-/*cookie过期时间*/
-var expireTime = 7 * 24 * 60 * 60 * 1000;
-
-function setCookie(name,value,unexpire) {
-    let cookie = typeof name == 'object' ? name : {[name]:value};
-    var exp = new Date();
-    exp.setTime(exp.getTime() + expireTime);
-    for(let key in cookie){
-        if(unexpire){
-            document.cookie = key + "="+ encodeURI(cookie[key]);
-        }else{
-            document.cookie = key + "="+ encodeURI(cookie[key]) + ";expires=" + exp.toGMTString();
-        }
-    }
-}
-function getCookie(name) {
-    var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
-    if(arr=document.cookie.match(reg))
-        return decodeURI(arr[2]);
-    else
-        return null;
-}
-function delCookie(name) {
-    let arr = name.length ? name : [name];
-    arr.map((v,k)=>{
-        var exp = new Date();
-        exp.setTime(exp.getTime() - expireTime);
-        var cval=getCookie(v);
-        if(cval!=null)
-            document.cookie= v + "="+cval+";expires="+exp.toGMTString();
-    });
-}
-
-
 
 function setLocalStorage(key,value){
     var curTime = new Date().getTime();

@@ -17,6 +17,7 @@
 #import "VerifyCertificateController.h"
 #import "BlockAlertView.h"
 #import "myAlertView.h"
+#import "vminfo.h"
 
 
 
@@ -76,22 +77,6 @@
     return self;
 }
 
-//计时回调函数
--(void) onTimer{
-    is_timeup=YES;
-    /* if(is_connect==YES)
-     {
-     NSLog(@"loging success.....");
-     }
-     else{*/
-    NSLog(@"one timer is up.....");
-  /*  myAlertView *alertView=[[[myAlertView alloc] init] autorelease];
-    [alertView viewDidLoad];
-    [alertView setMysession:_session];*/
-    //}
-    
-}
-
 //系统状态栏隐藏
 -(BOOL)prefersStatusBarHidden
 {
@@ -123,11 +108,7 @@
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-    
-
 }
-
-
 
 
 -(BOOL)shouldAutorotate{
@@ -189,9 +170,9 @@
         }
         else
             [_session connect];
-        
         _session_initilized = YES;
     }
+
 }
 
 - (void)viewWillDisappear:(BOOL)animated 
@@ -231,13 +212,12 @@
 #pragma mark ScrollView delegate methods
 // 返回一个放大或者缩小的视图
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
-{	
-    return _session_view;	
+{
+    return _session_view;
 }
 // 缩放结束时
--(void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
-{
-    NSLog(@"New zoom scale: %f", scale);
+-(void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat) scale {
+    [scrollView setZoomScale:scale animated:NO];
 	[_session_view setNeedsDisplay];
 }
 
@@ -337,11 +317,7 @@
     [_connecting_indicator_view stopAnimating];
     [_connecting_view removeFromSuperview];
     [_connecting_view autorelease];          
-    //new add
-    if(is_timeup) {
-        if(!is_timeup) //计时器没到时才关闭
-            [timer invalidate]; //关闭计时器。。。
-    }
+
     // return to bookmark list
 //    [[self navigationController] popViewControllerAnimated:YES];
     [self dismissViewControllerAnimated:YES completion:NULL];
@@ -349,19 +325,6 @@
 
 - (void)sessionWillConnect:(RDPSession*)session
 {
-    
-    //new add触发器开始计时
-    NSLog(@"start....");
-    is_timeup=NO;
-    // is_connect=NO;
-    is_closed=NO;
-    timer = [NSTimer scheduledTimerWithTimeInterval:15
-                                             target:self
-                                           selector:@selector(onTimer)
-                                           userInfo:nil
-                                            repeats:NO];
-
-    
     //加载一张图片
     _connectingBackgroundView = [[UIImageView alloc]initWithImage: [UIImage imageNamed:@"Default"]];
     _connectingBackgroundView.frame = CGRectMake(0, 0, [self view].frame.size.width, [self view].frame.size.height);
@@ -384,44 +347,62 @@
     [_connecting_indicator_view startAnimating];
 }
 
-//new add ,等待用户登陆，避免显示windows用户登陆界面
+//等待用户登陆，避免显示windows用户登陆界面（暂时未使用）
 - (void)sessionConnected:(RDPSession*)session
 {
-    is_timeup=YES;
-    is_closed=YES;
-    
-    NSLog(@"connected,wait for login....");
     // load connecting view
     [[NSBundle mainBundle] loadNibNamed:@"RDPConnectedView" owner:self options:nil];
     
     // set strings
-    [_lbl_connected setText:NSLocalizedString(@"已建立连接，正初始化登陆设置，请耐心等待", @"Connecting progress view - label")];
-    //[_cancel_connected_button setTitle:NSLocalizedString(@"Cancel", @"Cancel Button") forState:UIControlStateNormal];
+    [_lbl_connected setText:NSLocalizedString(@"成功登录，已建立连接，正初始化登陆设置，请耐心等待", @"Connecting progress view")];
     
     // center view and give it round corners
-    //[_connected_view setC];
     [_connected_view setCenter:[[self view] center]];
     [[_connected_view layer] setCornerRadius:10];
-    //[[self view] se
+
     // display connecting view and start indicator
     [[self view] addSubview:_connected_view];
     
-    
     [_connected_indicator_view startAnimating];
     
-    timer_connected=[NSTimer scheduledTimerWithTimeInterval:5
-                                                     target:self
-                                                   selector:@selector(onTimer2)
-                                                   userInfo:nil
-                                                    repeats:NO];
-    
+    NSLog(@"remove and release connected view...");
+    [_connected_indicator_view stopAnimating];
+    [_connected_view removeFromSuperview];
+    [_connected_view autorelease];
 }
 
+- (void) loadFloatButton {
+    //加载悬浮按钮
+    _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176, 46, 46)];
+    [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176);
+    _myfloatbutton.alpha=0.5;
+    _myfloatbutton.delegate=self;
+    _myfloatbutton.bannerIV.image=[UIImage imageNamed:@"menu.png"];
+    
+    [self.view addSubview:_myfloatbutton];
+    
+    _mymenuview=[[MenuView alloc] init];
+    
+    _mymenuview.clickMenuButton = ^(NSInteger tag){
+        ISShowMenuButton = YES;
+        [self floatTapAction:nil];
+        [self menuButtonTapAction:tag];
+    };
+}
 
 - (void)sessionDidConnect:(RDPSession*)session
 {
-    //登录成功，设置flag
-    NSLog(@"success to connect  message....");
+    //登录成功
+    NSLog(@"已经登录成功，freerdp实例创建成功！");
+    if([[_session sessionName] isEqualToString:[vminfo share].cancelBtnSessionName] && [_session isCancelConnected] == YES) { //_session代表当前session，而session不一定代表当前session
+        [vminfo share].cancelBtnSessionName = nil;
+        [_session disconnect];
+        [_session release];
+        _session = nil;
+        NSLog(@"开始断开取消按钮点击后要处理的那个rdp连接！");
+        return;
+    }
+
     if (!IOS_VERSION_7_OR_ABOVE)
     {
         CGRect rect=_touchpointer_view.frame;
@@ -436,22 +417,10 @@
         rect3.origin.x = 0;
         rect3.origin.y =0;
         _session_view.frame = rect3;
-        
     }
     
-    //is_connect=YES;
-    //登陆成功关掉计时器
-    if(is_timeup) //计时器没到时才关闭
-        if (timer) {
-            [timer invalidate]; //关闭计时器。。。
-
-        }
-    [[self view] makeToast:NSLocalizedString(@"接入云端成功", @"success to connect message") duration:ToastDurationNormal position:@"center"];
+    [[self view] makeToast:NSLocalizedString(@"接入云端成功", @"success to connect message") duration:ToastDurationShort position:@"center"];
     
-    //new add 2缩放
-    /*CGAffineTransform mytransform=CGAffineTransformScale(_session_scrollview.transform, 0.8, 0.7);
-     [_session_scrollview setTransform:mytransform];
-     [UIView commitAnimations];*/
     self.wantsFullScreenLayout=YES;
     
     // register keyboard notification handlers
@@ -468,7 +437,6 @@
     [_connecting_view autorelease];
     [_connectingBackgroundView autorelease];
     
-    // check if session settings changed ...
     // The 2nd width check is to ignore changes in resolution settings due to the RDVH display bug (refer to RDPSEssion.m for more details)
     ConnectionParams* orig_params = [session params];
     rdpSettings* sess_params = [session getSessionParams];
@@ -480,40 +448,10 @@
         [[self view] makeToast:message duration:ToastDurationNormal position:@"bottom"];        
     }
     //进入遮挡windows登陆界面的界面
-    [self sessionConnected:session];
-    
+//    [self sessionConnected:session];
     //挂载网盘第一次
-    [self postDataWhenFirstOpenRdp];
-   
-
-}
-
-//new add,计时关闭遮挡windows登陆界面的界面
--(void) onTimer2{
-    NSLog(@"one timer2 is up.....");
-    NSLog(@"remove and release connected view...");
-    [_connected_indicator_view stopAnimating];
-    [_connected_view removeFromSuperview];
-    [_connected_view autorelease];
-    
-    //加载悬浮按钮
-    _myfloatbutton=[[MyFloatButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176, 46, 46)];
-    [vminfo share].mypoint = CGPointMake(SCREEN_WIDTH-60, SCREEN_HEIGHT-176);
-    _myfloatbutton.alpha=0.5;
-    _myfloatbutton.delegate=self;
-    _myfloatbutton.bannerIV.image=[UIImage imageNamed:@"menu.png"];
-
-    [self.view addSubview:_myfloatbutton];
-    
-    _mymenuview=[[MenuView alloc] init];
-
-    _mymenuview.clickMenuButton = ^(NSInteger tag){
-        ISShowMenuButton = YES;
-        [self floatTapAction:nil];
-        [self menuButtonTapAction:tag];
-        
-    };
-
+    [self performSelector:@selector(postDataWhenFirstOpenRdp) withObject:nil afterDelay:0];
+    [self loadFloatButton]; //加载悬浮按钮
 }
 
 #pragma mark FloatButton TapAction
@@ -533,7 +471,6 @@
         }];
     }
     ISShowMenuButton = !ISShowMenuButton;
-    
 }
 //处理每个按钮的事件
 -(void)menuButtonTapAction:(NSInteger)tag
@@ -573,80 +510,49 @@
         }];
         [vminfo share].mypoint = temp;
     }
-    
 }
-
-
-
 
 - (void)sessionWillDisconnect:(RDPSession*)session
 {
 
 }
 //返回最初的界面
-- (void)sessionDidDisconnect:(RDPSession*)session
+- (void) sessionDidDisconnect:(RDPSession*)session
 {
     //向服务器发送关闭指令
     [self performSelector:@selector(closeOpenRdp) withObject:nil];
-    //[self closeOpenRdp];
-    
     //隐藏menu
     if(ISShowMenuButton)
     {
         [UIView animateWithDuration:0.2 animations:^{
             [_mymenuview dismiss];
         }];
-
     }
-
     [self dismissViewControllerAnimated:YES completion:NULL];
-    
 }
 
 #pragma mark close rdp
-
 //关闭rdp
--(void)closeOpenRdp
+-(void) closeOpenRdp
 {
     NSString *cuip=[vminfo share].cuIp;
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/SendMessageToAgent",cuip];
-    
-    NSURL *url=[NSURL URLWithString:Reset_vm_User];
-        NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
-    myrequest.HTTPMethod=@"POST";
-    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-
     NSDictionary *data=@{
                          @"vmusername":[vminfo share].vmusername,
                          @"ip":[vminfo share].vmip,
                          @"type":@"logoff"
                          };
-
-    NSData *jsondata = [NSJSONSerialization dataWithJSONObject:data options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest.HTTPBody = jsondata;
-    
-    
-    NSURLSession *mysession = [NSURLSession sharedSession];
-     [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-    }];
-    
+    [[[CommonUtils alloc] init] makeRequestToServer:Reset_vm_User withDictionary:data byHttpMethod:@"POST" type:@"closeOpenRdp函数"];
     if([[vminfo share].apptype isEqualToString:@"lca"])
     {
         [self sendDockerMessageToService];
     }
-    
+    NSLog(@"向cu发送断开应用的信息！");
 }
 //关闭docker应用的时候，想服务器发送消息
 -(void)sendDockerMessageToService
 {
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/sendMessageToDockerManager",[vminfo share].cuIp];
-    NSURL *url=[NSURL URLWithString:Reset_vm_User];
-    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
-    myrequest.HTTPMethod=@"POST";
-    
-    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    
     NSDictionary *json=@{
                          @"action":@"update",
                          @"dockerid":[vminfo share].dockerId,
@@ -654,43 +560,38 @@
                          @"userid":[vminfo share].uid,
                          @"appid":[vminfo share].appid
                          };
-    
-    NSData *data=[NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest.HTTPBody=data;
-    
-    NSURLSession *mysession = [NSURLSession sharedSession];
-    [mysession dataTaskWithRequest:myrequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-    }];
+    [[[CommonUtils alloc] init] makeRequestToServer:Reset_vm_User withDictionary:json byHttpMethod:@"POST" type:@"sendDockerMessageToService函数"];
 }
 
 //这里是屏幕缩放相关
 - (void)sessionBitmapContextWillChange:(RDPSession*)session
 {
-    // calc new view frame
     rdpSettings* sess_params = [session getSessionParams];
-    CGRect view_rect = CGRectMake(0, 0, sess_params->DesktopWidth, sess_params->DesktopHeight);
+    NSLog(@"设置的scrollview的分辨率：width:%d  height:%d", sess_params->DesktopWidth, sess_params->DesktopHeight);
+    CGRect view_rect;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        view_rect = CGRectMake(0, 0, sess_params->DesktopWidth/2, sess_params->DesktopHeight/2);
+        _session_scrollview.maximumZoomScale = 1;
+        _session_scrollview.minimumZoomScale = 0.5;
+        [_session_scrollview setZoomScale:0.5];
+        NSLog(@"IPHONE");
+    } else {
+        view_rect = CGRectMake(0, 0, sess_params->DesktopWidth, sess_params->DesktopHeight);
+        _session_scrollview.maximumZoomScale = 2;
+        _session_scrollview.minimumZoomScale = 1;
+        [_session_scrollview setZoomScale:1];
+        NSLog(@"IPAD");
+    }
     
-//    NSLog(@"%u %u",sess_params->DesktopWidth,sess_params->DesktopHeight);
-//CGRect view_rect_test = CGRectMake(0, 0, width, height);
-    _session_scrollview.maximumZoomScale = 1;
-    _session_scrollview.minimumZoomScale = 0.5;
-    
-    //顶部向下偏移30像素
-//    _session_scrollview.contentInset=UIEdgeInsetsMake(30, 0, 0, 0);
-
-    // reset  zoom level and update content size
-    NSLog(@"为甚么你没有缩成0.5");
     //设置画布大小的
     [_session_scrollview setContentSize:view_rect.size];
-
+    _session_scrollview.bounces = NO;
+    
     // set session view size
     [_session_view setFrame:view_rect];
-//    _session_view zoomrectto
-        [_session_scrollview setZoomScale:0.5];
+    
     // show/hide toolbar
     [_session setToolbarVisible:![[NSUserDefaults standardUserDefaults] boolForKey:@"ui.hide_tool_bar"]];
-//    [self showSessionToolbar:[_session toolbarVisible]];
 }
 
 - (void)sessionBitmapContextDidChange:(RDPSession*)session
@@ -711,26 +612,12 @@
 {
     CredentialsInputController* view_controller = [[[CredentialsInputController alloc] initWithNibName:@"CredentialsInputView" bundle:nil session:_session params:params] autorelease];
     [self presentModalViewController:view_controller animated:YES];
-    /* new add 关闭现有计时器，等待界面跳转后继续计时*/
-    if(!is_timeup&&is_closed==NO) //计时器没到时才关闭
-    {
-//        [timer invalidate]; //关闭计时器。。。
-        is_closed=YES;
-    }
-    
 }
 //核对用户名密码
 - (void)session:(RDPSession *)session verifyCertificateWithParams:(NSMutableDictionary *)params
 {
     VerifyCertificateController* view_controller = [[[VerifyCertificateController alloc] initWithNibName:@"VerifyCertificateView" bundle:nil session:_session params:params] autorelease];
     [self presentModalViewController:view_controller animated:YES];
-    /* new add 关闭现有计时器，等待界面跳转后继续计时*/
-    if(!is_timeup&&is_closed==NO) //计时器没到时才关闭
-    {
-        [timer invalidate]; //关闭计时器。。。
-        is_closed=YES;
-    }
-    
 }
 
 - (CGSize)sizeForFitScreenForSession:(RDPSession*)session
@@ -755,20 +642,13 @@
     vminfo *myinfo=[vminfo share];
     NSString *ip=myinfo.cuIp;
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/loadNetDisk",ip];
-    NSURL *url=[NSURL URLWithString:Reset_vm_User];
-    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
-    myrequest.HTTPMethod=@"POST";
-    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    
     NSMutableDictionary *dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:
                               myinfo.vmip,@"AppIP",
                               myinfo.vmpasswd,@"vmpasswd",
                               myinfo.vmusername,@"vmusername",
                               @"0",@"isFirst",
                               nil];
-    
     //挂载网盘
-    
     if(!flag) //卸载网盘
     {
         [dic setValue:@"-1" forKey:@"uid"];
@@ -778,16 +658,7 @@
         [dic setValue:myinfo.uid forKey:@"uid"];
     }
 
-    NSLog(@"%@",dic);
-    NSData *data=[NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest.HTTPBody=data;
-    
-    [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
-
-    
-    
-
-    
+    [[[CommonUtils alloc] init] makeRequestToServer:Reset_vm_User withDictionary:dic byHttpMethod:@"POST" type:@"postData函数（网盘）"];
 }
 
 -(void)postDataWhenFirstOpenRdp
@@ -795,27 +666,15 @@
     vminfo *myinfo=[vminfo share];
     NSString *ip=myinfo.cuIp;
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/loadNetDisk",ip];
-    NSURL *url=[NSURL URLWithString:Reset_vm_User];
-    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
-    myrequest.HTTPMethod=@"POST";
-    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    
     NSMutableDictionary *dic=[NSMutableDictionary dictionaryWithObjectsAndKeys:
                               myinfo.vmip,@"AppIP",
                               myinfo.vmpasswd,@"vmpasswd",
                               myinfo.vmusername,@"vmusername",
                               @"1",@"isFirst",
                               nil];
-    
     //挂载网盘
     [dic setValue:myinfo.uid forKey:@"uid"];
-    NSLog(@"%@",dic);
-    NSData *data=[NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest.HTTPBody=data;
-    
-  [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
-
-
+    [[[CommonUtils alloc] init] makeRequestToServer:Reset_vm_User withDictionary:dic byHttpMethod:@"POST" type:@"postDataWhenFirstOpenRdp函数（网盘）"];
 }
 
 #pragma mark - Keyboard Toolbar Handlers
@@ -918,36 +777,32 @@
 - (IBAction)toggleExtKeyboard:(id)sender
 {
     // if the sys kb is shown but not the advanced kb then toggle the advanced kb
-   
-
-    
 }
 
+//鼠标按钮点击后的处理事件
 - (IBAction)toggleTouchPointer:(id)sender
 {
     BOOL toggle_visibilty = ![_touchpointer_view isHidden];
     [_touchpointer_view setHidden:toggle_visibilty];
-    if(toggle_visibilty)
-        [_session_scrollview setContentInset:UIEdgeInsetsZero];
-    else
-        [_session_scrollview setContentInset:[_touchpointer_view getEdgeInsets]];
+    //解决鼠标在右下角部分无法点击的问题
+//    if(toggle_visibilty)
+//        [_session_scrollview setContentInset:UIEdgeInsetsZero];
+//    else
+//        [_session_scrollview setContentInset:[_touchpointer_view getEdgeInsets]];
 }
 
+//悬浮按钮的点击断开事件
 - (IBAction)disconnectSession:(id)sender
 {
     [_session disconnect];        
 }
 
-
+//取消按钮的点击事件响应
 -(IBAction)cancelButtonPressed:(id)sender
 {
-    if(!is_timeup && is_closed==NO) //计时器没到时才关闭
-        [timer invalidate]; //关闭计时器
-    [_session disconnect];
+    _session.isCancelConnected = YES;
+    [vminfo share].cancelBtnSessionName = _session.sessionName;
 }
-
-
-
 
 #pragma mark -
 #pragma mark iOS Keyboard Notification Handlers
@@ -957,12 +812,11 @@
 	
 	UIInterfaceOrientation ori = [[UIApplication sharedApplication] statusBarOrientation];
 	return ( ori == UIInterfaceOrientationLandscapeLeft || ori == UIInterfaceOrientationLandscapeRight );
-	
 }
 
 - (void)shiftKeyboard: (NSNotification*)notification {
 	
-	CGRect keyboardEndFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+	CGRect  keyboardEndFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 	
 	CGFloat previousHeight = _keyboard_last_height;
 	

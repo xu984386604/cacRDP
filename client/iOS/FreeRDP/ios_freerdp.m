@@ -98,7 +98,7 @@ int ios_run_freerdp(freerdp* instance)
 	mfContext* context = (mfContext*)instance->context;
 	mfInfo* mfi = context->mfi;
 	rdpChannels* channels = instance->context->channels;
-		
+    
 	mfi->connection_state = TSXConnectionConnecting;
 	
 	if (!freerdp_connect(instance))

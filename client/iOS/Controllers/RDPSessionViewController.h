@@ -17,16 +17,10 @@
 #import "MyTableAlert.h"
 #import "MyFloatButton.h"
 #import "MenuView.h"
-
+#import "CommonUtils.h"
 
 #define IOS_VERSION_7_OR_ABOVE (([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)? (YES):(NO))
 
-//触发器相关：
-NSTimer *timer;
-NSTimer *timer_connected;
-BOOL is_timeup;
-BOOL is_connect;
-BOOL is_closed;
 @interface RDPSessionViewController : UIViewController <RDPSessionDelegate, TouchPointerDelegate, AdvancedKeyboardDelegate, RDPKeyboardDelegate, UIScrollViewDelegate, UITextFieldDelegate>
 {
 	// scrollview that hosts the rdp session view
@@ -99,7 +93,7 @@ BOOL is_closed;
     BOOL ISShowMenuButton;
     MyFloatButton * _myfloatbutton;  //悬浮按钮
     MenuView * _mymenuview;          //显示的menu
-    
+
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil session:(RDPSession*)session;

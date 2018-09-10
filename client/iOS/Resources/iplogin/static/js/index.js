@@ -1,21 +1,21 @@
 setWinAapp();
 //先检测是否要自动登录
-let jumpfrom = GetQueryString('isAutoLogin');
-let canClearCookie = GetQueryString('canClearCookie');
+var jumpfrom = GetQueryString('isAutoLogin');
+var canClearCookie = GetQueryString('canClearCookie');
 if(canClearCookie == '1'){
     localStorage.setItem('autologin','false');
     localStorage.removeItem('enpw');
 }
 if(jumpfrom !== '0'){
-    let autologin = localStorage.getItem('autologin');
+    var autologin = localStorage.getItem('autologin');
     if(autologin == 'true'){
         //获取用户的输入
-        let username =  localStorage.getItem('user');
-        let encryptedPassword = localStorage.getItem('enpw');
+        var username =  localStorage.getItem('user');
+        var encryptedPassword = localStorage.getItem('enpw');
         //获取缓存中的ip地址
-        let ipstr = localStorage.getItem('ipaddress');
-        let authurl = 'http://'+ipstr+'/cu/index.php/Home/Auth/login.html';
-        let locationurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?code=';
+        var ipstr = localStorage.getItem('ipaddress');
+        var authurl = 'http://'+ipstr+'/cu/index.php/Home/Auth/login.html';
+        var locationurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?code=';
         //将信息发给后台验证
         $.ajax({
             url : authurl,
@@ -28,11 +28,16 @@ if(jumpfrom !== '0'){
         })
         .then(function(res){
             if(res.code == 800){
-            let sendData = {
+            var sendData = {
                 userID:res.data.userID,
                 operation : 'setUserId'
             }
             executeByTerminal(sendData);
+            var sendDataurl = {
+                url:ipstr,
+                operation : 'setIp'
+            }
+            executeByTerminal(sendDataurl);
             window.location.href = locationurl+res.data.code;  
             }else{
 
@@ -50,12 +55,12 @@ if(jumpfrom !== '0'){
     //先根据缓存渲染select
     renderselect();
     if(localStorage.getItem('lastipaddress')){
-        let ipstr = localStorage.getItem('lastipaddress');
-        let ipurl = 'http://'+ipstr+'/iplogin/logintest.html';
-        let authurl = 'http://'+ipstr+'/cu/index.php/Home/Auth/login.html';
-        let locationurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?code=';
-        let registurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?method=regist';
-        let forgeturl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?method=reset-password';
+        var ipstr = localStorage.getItem('lastipaddress');
+        var ipurl = 'http://'+ipstr+'/cu/iplogin/login.html?v=2';
+        var authurl = 'http://'+ipstr+'/cu/index.php/Home/Auth/login.html';
+        var locationurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?code=';
+        var registurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?method=regist';
+        var forgeturl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?method=reset-password';
         $('.y-head-icon').addClass('y-hide');
        if($('#username').length == 0){
          $('.ant-spin').removeClass('y-hide');
@@ -86,7 +91,7 @@ if(jumpfrom !== '0'){
                     //
                     localStorage.setItem('lastipaddress',ipstr);
                     //连接时发送ip地址
-                    let sendData = {
+                    var sendData = {
                         url:ipstr,
                         operation : 'setIp'
                     }
@@ -94,10 +99,10 @@ if(jumpfrom !== '0'){
                     //点击登录按钮
                     $('#login').click(function(){
                         //获取用户的输入
-                        let username = $('#username').val();
-                        let password = $('#password').val();
+                        var username = $('#username').val();
+                        var password = $('#password').val();
                         //这里要对密码进行加密
-                        let encryptedPassword =  encryptPassword(password);
+                        var encryptedPassword =  encryptPassword(password);
                         //将信息发给后台验证
                         $.ajax({
                             url : authurl,
@@ -125,7 +130,7 @@ if(jumpfrom !== '0'){
                                 localStorage.setItem('user',username);
                                 localStorage.setItem('enpw',encryptedPassword);
                                 //进行地址跳转
-                                let sendData = {
+                                var sendData = {
                                     userID:res.data.userID,
                                     operation : 'setUserId'
                                 }
@@ -152,6 +157,11 @@ if(jumpfrom !== '0'){
                         event.preventDefault();
                         window.location.href = forgeturl; 
                     })
+                    $('.exit a').click(function(event){
+                        event.preventDefault();
+                        //调用
+                        exit();
+                    })
                 },300)
             }
         },function(err,status){
@@ -170,6 +180,10 @@ if(jumpfrom !== '0'){
                     setTimeout(function(){
                         $('.ant-spin').addClass('y-hide');
                         $('.y-head-icon').removeClass('y-hide');
+                        if(!$('.collapse').hasClass('in')){
+                            $('.collapse').addClass('in');
+                        }
+                        
                     },300)
                 }
                     errorconsole($('.select-box'),'ip地址无法访问');
@@ -181,12 +195,12 @@ if(jumpfrom !== '0'){
         $('.collapse').addClass('in');
     }
     $("#configip").on('click touchstart', function(e){
-        let ipstr = document.querySelector('.cs-placeholder').dataset.ipaddress;
-        let ipurl = 'http://'+ipstr+'/iplogin/logintest.html';
-        let authurl = 'http://'+ipstr+'/cu/index.php/Home/Auth/login.html';
-        let locationurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?code=';
-        let registurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?method=regist';
-        let forgeturl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?method=reset-password';
+        var ipstr = document.querySelector('.cs-placeholder').dataset.ipaddress;
+        var ipurl = 'http://'+ipstr+'/cu/iplogin/login.html?v=2';
+        var authurl = 'http://'+ipstr+'/cu/index.php/Home/Auth/login.html';
+        var locationurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?code=';
+        var registurl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?method=regist';
+        var forgeturl = 'http://'+ipstr+'/cu/Public/vue/build/index.php?method=reset-password';
         //将按钮设置成loading状态
        $('.y-head-icon').addClass('y-hide');
        if($('#username').length == 0){
@@ -216,7 +230,7 @@ if(jumpfrom !== '0'){
                     localStorage.setItem('lastipaddress',ipstr);
                     $('#username').val(localStorage.getItem('user'));
                     //连接时发送ip地址
-                    let sendData = {
+                    var sendData = {
                         url:ipstr,
                         operation : 'setIp'
                     }
@@ -224,10 +238,10 @@ if(jumpfrom !== '0'){
                     //点击登录按钮
                     $('#login').click(function(){
                         //获取用户的输入
-                        let username = $('#username').val();
-                        let password = $('#password').val();
+                        var username = $('#username').val();
+                        var password = $('#password').val();
                         //这里要对密码进行加密
-                        let encryptedPassword =  encryptPassword(password);
+                        var encryptedPassword =  encryptPassword(password);
                         //将信息发给后台验证
                         $.ajax({
                             url : authurl,
@@ -255,7 +269,7 @@ if(jumpfrom !== '0'){
                                 localStorage.setItem('user',username);
                                 localStorage.setItem('enpw',encryptedPassword);
                                 //登录 进行地址跳转
-                                let sendData = {
+                                var sendData = {
                                     userID:res.data.userID,
                                     operation : 'setUserId'
                                 }
@@ -282,6 +296,11 @@ if(jumpfrom !== '0'){
                         event.preventDefault();
                         window.location.href = forgeturl; 
                     })
+                    $('.exit a').click(function(event){
+                        event.preventDefault();
+                        //调用
+                        exit();
+                    })
                 },300)
             }
         },function(err,status){
@@ -300,6 +319,9 @@ if(jumpfrom !== '0'){
                     setTimeout(function(){
                         $('.ant-spin').addClass('y-hide');
                         $('.y-head-icon').removeClass('y-hide');
+                        if(!$('.collapse').hasClass('in')){
+                            $('.collapse').addClass('in');
+                        }
                     },300)
                 }
                     errorconsole($('.select-box'),'ip地址无法访问');
@@ -368,9 +390,19 @@ function isValidinput(data){
 
 //与客户端通信，向客户端发送当前打开的ip地址
 function executeByTerminal(sendData){
-    window.app.executeByTerminal(JSON.stringify(sendData));
+    if(window.app){
+        window.app.executeByTerminal(JSON.stringify(sendData));
+    }
+    
 };
 
+//与window通信，用于应用关闭
+function exit(){
+    if(window.app){
+        window.app.exit();
+    }
+    
+}
 
 //与安卓端通信，确定页面跳转方向
 function getjumpfrom(){
@@ -437,7 +469,7 @@ function setActiveIp(){
 }
 
 function errorconsole($el,text){
-    let tiphtml = "<div class='bugtip'>"+text+"</div>";
+    var tiphtml = "<div class='bugtip'>"+text+"</div>";
     $el.append(tiphtml);
     setTimeout(function(){
         $('.bugtip').remove();

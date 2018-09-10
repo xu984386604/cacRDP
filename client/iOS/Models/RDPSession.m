@@ -15,6 +15,8 @@
 #import "TSXTypes.h"
 #import "Bookmark.h"
 #import "ConnectionParams.h"
+#import "CommonUtils.h"
+#import "vminfo.h"
 
 NSString* TSXSessionDidDisconnectNotification = @"TSXSessionDidDisconnect";
 NSString* TSXSessionDidFailToConnectNotification = @"TSXSessionDidFailToConnect";
@@ -50,10 +52,10 @@ NSString* TSXSessionDidFailToConnectNotification = @"TSXSessionDidFailToConnect"
 	
 	if (!bookmark)
 		[NSException raise:NSInvalidArgumentException format:@"%s: params may not be nil.", __func__];
-	
+    _isCancelConnected = NO; //是否取消连接
     _bookmark = [bookmark retain];
 	_params = [[bookmark params] copy];
-    _name = [[bookmark label] retain];
+    _name = [[CommonUtils cNowTimestamp] retain];
     _delegate = nil;	
     _toolbar_visible = NO;
 	_freerdp = ios_freerdp_new();
@@ -207,7 +209,6 @@ NSString* TSXSessionDidFailToConnectNotification = @"TSXSessionDidFailToConnect"
     settings->AudioCapture = FALSE;
 	
 	[self mfi]->session = self;
-    self.isClosed = [self mfi]->connection_state;//rdp状态信息的暴露
 	return self;
 
 out_free:
@@ -272,7 +273,10 @@ out_free:
 	if (mfi->connection_state == TSXConnectionConnecting)
 	{
 		mfi->unwanted = YES;
-		[self sessionDidDisconnect];
+        if([vminfo share].cancelBtnSessionName) {
+            //防止调用2次sessionDidDisconnect方法，另外一次是runsessionFinished方法调用的sessionDidDisconnect方法，不处理的话会导致发送2次logoff断开信息给服务器
+            [self sessionDidDisconnect];
+        }
 		return;
 	}	
 }
@@ -385,7 +389,6 @@ out_free:
     [self performSelectorOnMainThread:@selector(sessionWillConnect) withObject:nil waitUntilDone:YES];
     int result_code = ios_run_freerdp(_freerdp);
     [self mfi]->connection_state = TSXConnectionDisconnected;
-    self.isClosed = [self mfi]->connection_state;//rdp状态信息的暴露，可以在此发送断开连接的信息
     [self performSelectorOnMainThread:@selector(runSessionFinished:) withObject:[NSNumber numberWithInt:result_code] waitUntilDone:YES];
 
     [pool release];
@@ -396,7 +399,6 @@ out_free:
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"recoverMsg"];
 	int result_code = [result intValue];
-	
 	switch (result_code)
 	{
 		case MF_EXIT_CONN_CANCELED:
@@ -425,7 +427,7 @@ out_free:
 - (void)sessionDidConnect
 {
 	if ([[self delegate] respondsToSelector:@selector(sessionDidConnect:)])	
-		[[self delegate] sessionDidConnect:self];	
+		[[self delegate] sessionDidConnect:self];
 }
 
 - (void)sessionDidFailToConnect:(int)reason

@@ -16,8 +16,7 @@
  *****************************/
 -(void)AcceptTheDataFromJs:(NSString *)data
 {
-    NSLog(@"准备打开应用！");
-    [CommonUtils currentStandardFormatDate:@"AcceptTheDataFromJs函数第20行"]; //test
+    NSLog(@"准备打开应用,开始接收cu发送过来的rdp的连接信息！");
     NSData *str=[data dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err=nil;
     _dic = [NSJSONSerialization JSONObjectWithData:str options:NSJSONReadingMutableLeaves error:&err];
@@ -84,14 +83,7 @@
         [[NSNotificationCenter defaultCenter]
          postNotificationName:@"paramErrorMessage" object:nil];
     }
-    [CommonUtils currentStandardFormatDate:@"AcceptTheDataFromJs函数第87行"]; //test
 }
-
-
-
-
-
-
 
 /*****************************
  
@@ -169,7 +161,7 @@
 {
      //[[NSNotificationCenter defaultCenter] postNotificationName:@"stoppostMessageToservice" object:@"loginMsg"];
     //注销后返回到iplogin界面
-    NSDictionary *dic = @{@"filename":@"testhe",
+    NSDictionary *dic = @{@"filename":@"index",
                           @"dirname":@"iplogin"
                           };
     [[NSNotificationCenter defaultCenter] postNotificationName:@"loadLocalHTML" object:nil userInfo:dic];

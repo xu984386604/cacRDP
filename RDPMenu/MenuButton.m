@@ -49,6 +49,7 @@
     return self;
 }
 
+//鼠标按钮的实例化
 +(instancetype)buttonWithTitle:(NSString *)title imageTitle:(NSString *)imageTitle center:(CGPoint)point
 {
     CGRect frame = CGRectMake(0, 0, 60, 60);
@@ -57,7 +58,6 @@
     [menu4 setTitle:title forState:UIControlStateNormal];
     [menu4 setImage:[UIImage imageNamed:imageTitle] forState:UIControlStateNormal];
     return menu4;
-
 }
 
 

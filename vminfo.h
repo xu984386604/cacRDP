@@ -1,7 +1,7 @@
 //
 //  vminfo.h
 //  FreeRDP
-//  用来存储解析xml的数据
+//  用来存储共享的数据
 //  Created by conan on 16/1/8.
 //
 //
@@ -26,36 +26,37 @@
 @property (nonatomic, copy) NSNumber *gateport;
 @property (nonatomic, copy) NSString *gateusername;
 @property (nonatomic, copy) NSString *gatepasswd;
-@property (nonatomic,copy)  NSString *gatewaycheck;
+@property (nonatomic, copy)  NSString *gatewaycheck;
 
 
 @property (nonatomic, copy) NSString *tsport;
 @property (nonatomic, copy) NSString *tsusername;
 @property (nonatomic, copy) NSString *tsip;
-@property (nonatomic,copy)  NSString *tspwd;
+@property (nonatomic, copy) NSString *tspwd;
 
 //ct用户的id
-@property (nonatomic,copy)  NSString *uid;
+@property (nonatomic, copy)  NSString *uid;
 
 //应用类型
-@property (nonatomic,copy) NSString * apptype;
+@property (nonatomic, copy) NSString * apptype;
 //docker类应用的信息
-@property (nonatomic,copy) NSString * dockerIp;
-@property (nonatomic,copy) NSString * dockerId;
-@property (nonatomic,copy) NSString * dockerVncPwd;
-@property (nonatomic,copy) NSString * dockerPort;
-@property (nonatomic,copy) NSString * appid;
+@property (nonatomic, copy) NSString * dockerIp;
+@property (nonatomic, copy) NSString * dockerId;
+@property (nonatomic, copy) NSString * dockerVncPwd;
+@property (nonatomic, copy) NSString * dockerPort;
+@property (nonatomic, copy) NSString * appid;
 
 
-@property (nonatomic,copy) NSString *cuIp;
+@property (nonatomic, copy) NSString *cuIp;
 
-@property (nonatomic,assign) CGPoint mypoint;
+@property (nonatomic, assign) CGPoint mypoint;
 @property (nonatomic, strong) NSTimer *recoverTimer; //恢复连接信息的定时发送器
 @property (nonatomic, strong) NSTimer *checkTimer; //检查存活的远程应用（session）的定时器,存在多个rdp远程应用时会用到
 
-@property(atomic, strong) NSMutableDictionary *multiRdpRecoverInfo; //保存多个远程应用的恢复信息
-@property(atomic, strong) NSMutableDictionary *multiRdpSession; //保存多个远程应用session
+@property (atomic, strong) NSMutableDictionary *multiRdpRecoverInfo; //保存多个远程应用的恢复信息
+@property (atomic, strong) NSMutableDictionary *multiRdpSession; //保存多个远程应用session
 
+@property (atomic, copy) NSString *cancelBtnSessionName; //取消按钮断开的那个应用的名字
 
 +(instancetype) share;
 +(void) filterRecoverRdpinfoDic;

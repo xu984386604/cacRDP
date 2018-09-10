@@ -13,11 +13,9 @@
 #import "FontAwesome/NSString+FontAwesome.h"
 #import "UpdateApp/UpdateApp.h"
 
-
 #define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
 #define SCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
-#define LOCALMD5      @"b741b5681e71190588bfe85c742d4e12"
-
+#define LOCALMD5      @"e968672891a22c65b660895cb564628c"
 
 
 @interface CuWebViewController () <MyFloatButtonDelegate>
@@ -35,20 +33,12 @@
     innerNet=@"1"; //默认外网
     _isNotFirstLoad = NO; //解决页面刷新后或者新请求后出现桥断裂的情况
     [self isFirstLoad]; //判断程序是否是第一次安装启动，是的话则生成一个loginuuid
-    BOOL md5check=[self MD5check];
+    BOOL md5check = [self MD5check];
     if(md5check)
     {
-        [self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
+        [self loadLocalHTML:@"index" inDirectory:@"iplogin"];
     }
-    //NSString *str = @"http://ruanyf.github.io/es-checker/index.cn.html";
-    //myWebView = nil;
-    //myWebView = [[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    //[self.view addSubview:myWebView];
-    //myWebView.delegate = self;
-    //NSURLRequest *myrequest = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
-    //[myWebView loadRequest:myrequest];
 
-    //[self loadLocalHTML:@"testhe" inDirectory:@"iplogin"];
     [self initMyFloatButton];
     
     
@@ -78,6 +68,7 @@
     myWebView.delegate=self;
     [myWebView loadRequest:myrequest];
     [self.view addSubview:myWebView];
+    [(UIScrollView *)[[myWebView subviews] objectAtIndex:0] setBounces:NO];
     //_isNotFirstLoad = YES;
 }
 
@@ -85,8 +76,6 @@
 -(void) loadLocalHTML:(NSString*) fileName  inDirectory:(NSString*) dirName{
     myWebView=[[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     myWebView.delegate=self;
-    
-
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"html" inDirectory:dirName];
     filePath = [NSString stringWithFormat:@"%@?isAutoLogin=1", filePath]; //1代表应用第一次打开登录页面
@@ -96,6 +85,7 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [myWebView loadRequest:request];
     [self.view addSubview:myWebView];
+    [(UIScrollView *)[[myWebView subviews] objectAtIndex:0] setBounces:NO];
 }
 
 //加载本地网页(notice)
@@ -108,6 +98,7 @@
     NSURL *url = [NSURL URLWithString:filePath];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [myWebView loadRequest:request];
+    [(UIScrollView *)[[myWebView subviews] objectAtIndex:0] setBounces:NO];
 }
 
 #pragma mark openrdp
@@ -116,7 +107,10 @@
  ********************/
 -(void)openRdp
 {
-    [CommonUtils currentStandardFormatDate:@"openRdp函数第119行"]; //test
+    if ([vminfo share].cancelBtnSessionName) {
+        NSLog(@"上一次取消打开的应用还没有关闭！请稍等！");
+        return;
+    }
     ComputerBookmark *bookmark = [[[ComputerBookmark alloc] initWithBaseDefaultParameters] autorelease];
 
     [[bookmark params] setValue:_connectInfo.remoteProgram  forKey:@"remote_program"];
@@ -139,7 +133,6 @@
         [self sendMessageToDocker];
     }
     
-
     CGRect rect = [[UIScreen mainScreen] bounds];
     CGSize size = rect.size;
     
@@ -150,16 +143,23 @@
         height = width;
         width = temp;
     }
-    [[bookmark params] setInt:height*2 forKey:@"width"];
-    [[bookmark params] setInt:width*2 forKey:@"height"];
-    [CommonUtils currentStandardFormatDate:@"openRdp函数第155行"]; //test
-    NSLog(@"%@",[bookmark params]);
-    RDPSession* session = [[[RDPSession alloc] initWithBookmark:bookmark] autorelease];
-    RDPSessionViewController* ctrl = [[[RDPSessionViewController alloc] initWithNibName:@"RDPSessionView" bundle:nil session:session] autorelease];
+    NSLog(@"设置的分辨率：width:%d  height:%d", width, height);
+    //设置分辨率
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        [[bookmark params] setInt:height * 2 forKey:@"width"];
+        [[bookmark params] setInt:width * 2 forKey:@"height"];
+        NSLog(@"IPHONE");
+    } else {
+        [[bookmark params] setInt:height forKey:@"width"];
+        [[bookmark params] setInt:width forKey:@"height"];
+    }
     
+    NSLog(@"连接参数：%@",[bookmark params]);
+    RDPSession* session = [[[RDPSession alloc] initWithBookmark:bookmark] autorelease];
+    NSLog(@"rdp连接的session的名称：%@", session.sessionName);
+    RDPSessionViewController* ctrl = [[[RDPSessionViewController alloc] initWithNibName:@"RDPSessionView" bundle:nil session:session] autorelease];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self presentViewController:ctrl animated:YES completion:^{}];
-        [CommonUtils currentStandardFormatDate:@"openRdp函数第162行"]; //test
     });
     
     NSDictionary *jsonData = @{
@@ -168,20 +168,10 @@
                  @"userid": [vminfo share].uid,
                  @"vmip": [vminfo share].vmip
                  };
-    NSString *key = [NSString stringWithFormat:@"ios%@", [CommonUtils cNowTimestamp]];
-   
-    //[[vminfo share].multiRdpSession setObject:session forKey:key]; //多个远程应用需要的操作
-    //NSLog(@"存入multiRdpSession的信息：%@", [[vminfo share].multiRdpSession objectForKey:key]);
+    NSString *key = [NSString stringWithFormat:@"ios%@", [session sessionName]];
     [vminfo share].multiRdpRecoverInfo = [NSMutableDictionary dictionary];
     [[vminfo share].multiRdpRecoverInfo setObject:jsonData forKey:key];
     NSLog(@"存入multiRdpRecoverInfo的信息：%@", [[vminfo share].multiRdpRecoverInfo objectForKey:key]);
-    //如果之前不存在已打开的应用
-    //if ([[vminfo share].multiRdpRecoverInfo count] == 1) {
-    //     [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"recoverMsg"];
-    //}
-
-    //[vminfo filterRecoverRdpinfoDic];
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"postMessageToservice" object:@"recoverMsg"];
 }
 
@@ -352,19 +342,11 @@
 
 #pragma mark sendMessageToDocker
 /*******************
- 
  **function:将docker的信息封装，发送给服务器。
- 
  *******************/
 -(void)sendMessageToDocker
 {
     NSString *Reset_vm_User=[NSString stringWithFormat:@"%@cu/index.php/Home/Client/sendMessageToDockerManager",_connectInfo.cuIp];
-    NSURL *url=[NSURL URLWithString:Reset_vm_User];
-    NSMutableURLRequest *myrequest=[NSMutableURLRequest requestWithURL:url];
-    myrequest.HTTPMethod=@"POST";
-    
-    [myrequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    
     NSDictionary *json=@{
                          @"action":@"update",
                          @"dockerid":_connectInfo.dockerId,
@@ -372,13 +354,8 @@
                          @"userid":_connectInfo.uid,
                          @"appid":_connectInfo.appid
                          };
-    
-    NSData *data=[NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:nil];
-    myrequest.HTTPBody=data;
-    
-    [NSURLConnection sendSynchronousRequest:myrequest returningResponse:nil error:nil];
+    [[[CommonUtils alloc] init] makeRequestToServer:Reset_vm_User withDictionary:json byHttpMethod:@"POST" type:@"sendMessageToDocker函数"];
 }
-
 
 #pragma mark -
 #pragma mark 支付宝相关方法
@@ -431,6 +408,7 @@
             myWebView.delegate = self;
             [myWebView loadRequest:request];
             //reset the firstload flag to load the new request
+            [(UIScrollView *)[[myWebView subviews] objectAtIndex:0] setBounces:NO];
             _isNotFirstLoad = NO;
             return NO;
         }
@@ -445,18 +423,11 @@
     if (urlStr.length > 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSURLRequest *webRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:urlStr]
-                                                        cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                                    timeoutInterval:30];
+                cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:30];
             [myWebView loadRequest:webRequest];
         });
     }
 }
-
-//屏幕支持的方向
-
-/*-(UIInterfaceOrientationMask)supportedInterfaceOrientations{
-    return UIInterfaceOrientationMaskPortrait;
-}*/
 
 //悬浮按钮的点击事件
 - (void)floatTapAction:(MyFloatButton *)sender{
@@ -482,12 +453,10 @@
 
 //加载支付宝支付的浮动按钮
 - (void) loadAlipayFloatButton {
-    
     _myfloatbutton.hidden=NO;
     [self.view addSubview:_myfloatbutton];
-    
-    
 }
+
 -(void)initMyFloatButton
 {
     if(!_myfloatbutton) {
@@ -503,7 +472,6 @@
         _myfloatbutton.bannerIV.image= [CommonUtils text:fontIcon addToView:menuPicWithAlpha textColor:fontIconColor textSize:38];
         _myfloatbutton.hidden=YES;
     }
-
 }
 //移除支付宝支付的浮动按钮
 - (void) removeAlipayFloatButton {
@@ -522,13 +490,8 @@
     [UIView setAnimationDuration:0.4];
     [UIView setAnimationDelegate:self];
     [UIView animateWithDuration:0.4 animations:^{
-       
-        myWebView.frame = CGRectMake(0, 0,
-                                     self.view.frame.size.width, self.view.frame.size.height);
+        myWebView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     }];
-    
-    
-    
     
     if(_myfloatbutton)
     {
@@ -540,7 +503,6 @@
         float y = m.y;
         
         CGPoint m2 = CGPointZero;
-        
         
         if( x < SCREEN_WIDTH / 2)  //left
         {
@@ -566,7 +528,6 @@
             [_myfloatbutton setCenter:m2];
             [vminfo share].mypoint = m2;
                     }];
-        
     }
     
     [UIView commitAnimations];
@@ -604,7 +565,6 @@
         NSData * fileData = [handle readDataOfLength:256];
         CC_MD5_Update(&md5, [fileData bytes], [fileData length]);
         if( [fileData length] == 0 ) done = YES;
-        
     }
     
     unsigned char digest[CC_MD5_DIGEST_LENGTH];
@@ -625,17 +585,15 @@
 -(BOOL)MD5check
 {
     
-    NSString *filepath= [[NSBundle mainBundle] pathForResource:@"testhe" ofType:@"html" inDirectory:@"iplogin"];
+    NSString *filepath= [[NSBundle mainBundle] pathForResource:@"index" ofType:@"html" inDirectory:@"iplogin"];
     NSString *resultMD5=[self fileMD5:filepath];
     NSLog(@"resultMD5:%@", resultMD5);
     if ([resultMD5 isEqualToString:LOCALMD5]) {
         return YES;
-    }else
-    {
+    } else {
         [self showMD5CheckAlert]; //错误提示
         return NO;
     }
-    
 }
 //md5校验 错误提示信息
 -(void)showMD5CheckAlert

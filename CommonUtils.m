@@ -219,4 +219,28 @@ bool IsInner(unsigned int userIp, unsigned int begin, unsigned int end)
     return newImage; 
 }
 
+
+#pragma 网络连接相关
+
+//向服务器发起请求，因是异步执行，故返回的数据不能立即得到，所以需要在回调函数里面进行处理，可以采用在参数里面加一个回调函数的参数传入
+- (void) makeRequestToServer:(NSString*)urlString withDictionary:(NSDictionary*)dic byHttpMethod:(NSString*) method type:(NSString *) type{
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+    [request setHTTPMethod:method];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    NSData *sendData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
+    request.HTTPBody = sendData;
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    
+    NSURLSessionDataTask *sessionData = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data,NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSLog(@"发送%@信息的请求返回状态码：%ld", type, (long)httpResponse.statusCode);
+        if(data) {
+            
+        }
+    }];
+    [sessionData resume]; //如果request任务暂停了，则恢复
+}
+
+
 @end
